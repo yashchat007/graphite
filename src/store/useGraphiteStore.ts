@@ -15,6 +15,12 @@ import type {
   UndoAction,
 } from '../lib/types'
 import { nowIso } from '../lib/sync-document'
+import {
+  pomodoroPause,
+  pomodoroRemainingSeconds,
+  pomodoroStart,
+  pomodoroSyncRunning,
+} from '../lib/pomodoro'
 
 export interface GraphiteState {
   hydrated: boolean
@@ -38,6 +44,8 @@ export interface GraphiteState {
   focusMode: boolean
   focusTaskId: string | null
   pomodoro: PomodoroState
+  /** Bumped by the app-level pomodoro clock so timer UIs re-render without local intervals. */
+  pomodoroClockMs: number
   undoQueue: UndoAction[]
   quickAddDraft: string
 
@@ -74,7 +82,7 @@ export interface GraphiteState {
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
 
-  tickPomodoro: () => void
+  syncPomodoro: (now?: number) => void
   startPomodoro: (taskId?: string) => void
   pausePomodoro: () => void
   resetPomodoro: () => void
@@ -88,6 +96,8 @@ const defaultPomodoro: PomodoroState = {
   remaining: 25 * 60,
   phase: 'work',
   running: false,
+  runningStartedAt: null,
+  runningRemainingStart: 25 * 60,
 }
 
 export function applyTaskFilters(
@@ -124,6 +134,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       focusMode: false,
       focusTaskId: null,
       pomodoro: { ...defaultPomodoro },
+      pomodoroClockMs: 0,
       undoQueue: [],
       quickAddDraft: '',
 
@@ -336,28 +347,36 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       popUndo: (id) => set((s) => ({ undoQueue: s.undoQueue.filter((u) => u.id !== id) })),
 
-      tickPomodoro: () => {
-        const p = get().pomodoro
-        if (!p.running) return
-        if (p.remaining <= 1) {
-          const nextPhase = p.phase === 'work' ? 'break' : 'work'
-          const nextRemaining = nextPhase === 'work' ? p.workSeconds : p.breakSeconds
-          set({ pomodoro: { ...p, phase: nextPhase, remaining: nextRemaining } })
-        } else {
-          set({ pomodoro: { ...p, remaining: p.remaining - 1 } })
-        }
+      syncPomodoro: (now = Date.now()) => {
+        const synced = pomodoroSyncRunning(get().pomodoro, now)
+        const remaining = pomodoroRemainingSeconds(synced, now)
+        const pomodoro =
+          synced.remaining !== remaining ? { ...synced, remaining } : synced
+        set({ pomodoro, pomodoroClockMs: now })
       },
 
       startPomodoro: (taskId) =>
-        set((s) => ({
-          pomodoro: {
-            ...s.pomodoro,
-            running: true,
-            focusTaskId: taskId ?? s.pomodoro.focusTaskId ?? s.selectedTaskId ?? undefined,
-          },
-        })),
+        set((s) => {
+          const now = Date.now()
+          let pomodoro = pomodoroStart(
+            {
+              ...s.pomodoro,
+              focusTaskId: taskId ?? s.pomodoro.focusTaskId ?? s.selectedTaskId ?? undefined,
+            },
+            now,
+          )
+          pomodoro = pomodoroSyncRunning(pomodoro, now)
+          return { pomodoro, pomodoroClockMs: now }
+        }),
 
-      pausePomodoro: () => set((s) => ({ pomodoro: { ...s.pomodoro, running: false } })),
+      pausePomodoro: () =>
+        set((s) => {
+          const now = Date.now()
+          return {
+            pomodoro: pomodoroPause(s.pomodoro, now),
+            pomodoroClockMs: now,
+          }
+        }),
 
       resetPomodoro: () =>
         set((s) => ({
@@ -366,7 +385,10 @@ export const useGraphiteStore = create<GraphiteState>()(
             running: false,
             phase: 'work',
             remaining: s.pomodoro.workSeconds,
+            runningStartedAt: null,
+            runningRemainingStart: s.pomodoro.workSeconds,
           },
+          pomodoroClockMs: Date.now(),
         })),
 
       setPomodoroFocusTask: (taskId) =>

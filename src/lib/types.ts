@@ -51,8 +51,13 @@ export interface UndoAction {
 export interface PomodoroState {
   workSeconds: number
   breakSeconds: number
+  /** Seconds left in the current phase while paused (and after resume bookkeeping). */
   remaining: number
   phase: 'work' | 'break'
   running: boolean
+  /** Wall-clock ms when the current running segment started; null while paused. */
+  runningStartedAt: number | null
+  /** Remaining seconds at `runningStartedAt` for the active segment. */
+  runningRemainingStart: number
   focusTaskId?: string
 }

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Pause, Play, RotateCcw } from 'lucide-react'
-import { useEffect } from 'react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
+import { pomodoroProgress, pomodoroRemainingSeconds } from '../../lib/pomodoro'
 import { GlassCard } from '../../components/ui/GlassCard'
 import { Button } from '../../components/ui/Button'
 
@@ -13,23 +13,18 @@ function formatTime(seconds: number): string {
 
 export function PomodoroCard() {
   const pomodoro = useGraphiteStore((s) => s.pomodoro)
+  const pomodoroClockMs = useGraphiteStore((s) => s.pomodoroClockMs)
   const tasks = useGraphiteStore((s) => s.tasks)
-  const tickPomodoro = useGraphiteStore((s) => s.tickPomodoro)
   const startPomodoro = useGraphiteStore((s) => s.startPomodoro)
   const pausePomodoro = useGraphiteStore((s) => s.pausePomodoro)
   const resetPomodoro = useGraphiteStore((s) => s.resetPomodoro)
   const selectedTaskId = useGraphiteStore((s) => s.selectedTaskId)
 
-  const total = pomodoro.phase === 'work' ? pomodoro.workSeconds : pomodoro.breakSeconds
-  const progress = 1 - pomodoro.remaining / total
+  const displayNow = pomodoro.running ? pomodoroClockMs : 0
+  const remaining = pomodoroRemainingSeconds(pomodoro, displayNow)
+  const progress = pomodoroProgress(pomodoro, displayNow)
   const circumference = 2 * Math.PI * 54
   const focusTask = tasks.find((t) => t.id === (pomodoro.focusTaskId ?? selectedTaskId))
-
-  useEffect(() => {
-    if (!pomodoro.running) return
-    const id = window.setInterval(() => tickPomodoro(), 1000)
-    return () => clearInterval(id)
-  }, [pomodoro.running, tickPomodoro])
 
   return (
     <GlassCard className="p-5">
@@ -71,13 +66,13 @@ export function PomodoroCard() {
             </defs>
           </svg>
           <motion.div
-            key={pomodoro.remaining}
+            key={remaining}
             initial={{ opacity: 0.5 }}
             animate={{ opacity: 1 }}
             className="absolute inset-0 flex flex-col items-center justify-center"
           >
             <span className="text-3xl font-semibold tabular-nums text-heading">
-              {formatTime(pomodoro.remaining)}
+              {formatTime(remaining)}
             </span>
           </motion.div>
         </div>
