@@ -38,7 +38,6 @@ export interface Tombstone {
 }
 
 export type FilterStatus = 'all' | 'todo' | 'done'
-export type NavView = 'dashboard' | 'tasks' | 'calendar'
 
 export interface StoredFile {
   id: string

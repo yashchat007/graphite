@@ -24,7 +24,6 @@ await page.evaluate(() => {
   const raw = localStorage.getItem(key)
   if (!raw) return
   const parsed = JSON.parse(raw)
-  parsed.state.filterStatus = 'all'
   const ago3d = new Date(Date.now() - 3 * 86400000).toISOString()
   const ago1d = new Date(Date.now() - 86400000).toISOString()
   parsed.state.files = [
@@ -53,18 +52,19 @@ await page.evaluate(() => {
 
 await page.reload({ waitUntil: 'networkidle' })
 await waitHero()
-await page.waitForTimeout(800)
+await page.waitForTimeout(600)
 
 await page.setViewportSize({ width: 1440, height: 900 })
-await page.screenshot({ path: `${OUT}/graphite-dashboard-states-1440x900.png` })
-await page.screenshot({ path: `${OUT}/graphite-my-files-1440x900.png`, clip: { x: 900, y: 120, width: 520, height: 420 } })
+await page.screenshot({ path: `${OUT}/graphite-dashboard-completed-1440x900.png`, fullPage: true })
+
+await page.screenshot({
+  path: `${OUT}/graphite-sidebar-focus-1440x900.png`,
+  clip: { x: 0, y: 0, width: 280, height: 900 },
+})
 
 await page.setViewportSize({ width: 390, height: 844 })
-await page.waitForTimeout(500)
-await page.screenshot({ path: `${OUT}/graphite-mobile-390x844.png` })
+await page.waitForTimeout(400)
+await page.screenshot({ path: `${OUT}/graphite-mobile-390x844.png`, fullPage: true })
 
 await browser.close()
-console.log(
-  'Artifacts (My files mocked — no BLOB_READ_WRITE_TOKEN in VM):',
-  (await readdir(OUT)).filter((f) => f.endsWith('graphite-') && f.endsWith('.png')).join(', '),
-)
+console.log('Artifacts:', (await readdir(OUT)).filter((f) => f.startsWith('graphite-') && f.endsWith('.png')).join(', '))

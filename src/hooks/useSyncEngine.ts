@@ -55,7 +55,7 @@ async function flushSyncPush() {
     setLastSyncedAt(new Date().toISOString())
   } catch {
     setSyncStatus('offline')
-    setSyncError('Could not reach sync server. Changes stay on this device.')
+    setSyncError('Could not reach sync server. Will retry automatically.')
   } finally {
     pushInFlight = false
     if (pendingPush) scheduleSyncPush()

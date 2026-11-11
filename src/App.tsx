@@ -12,7 +12,6 @@ import { ShortcutsSheet } from './components/modals/ShortcutsSheet'
 import { TaskModal } from './components/modals/TaskModal'
 import { UndoToast } from './components/feedback/UndoToast'
 import { FocusOverlay } from './components/focus/FocusOverlay'
-import { PomodoroCard } from './features/focus/PomodoroCard'
 import { TodayNote } from './features/tasks/TodayNote'
 import { MyFilesCard } from './features/tasks/MyFilesCard'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
@@ -94,12 +93,10 @@ export default function App() {
             <aside className="flex w-full shrink-0 flex-col gap-4 border-t border-white/5 p-4 lg:w-[300px] lg:border-l lg:border-t-0 lg:overflow-y-auto">
               <TodayNote />
               <MyFilesCard />
-              <PomodoroCard />
             </aside>
           </div>
         </motion.div>
       </motion.main>
-      <Sidebar mobile />
       <CommandPalette />
       <ShortcutsSheet />
       <TaskModal />

@@ -10,7 +10,7 @@ export function useCompletedSectionTasks() {
   const filterStatus = useGraphiteStore((s) => s.filterStatus)
 
   return useMemo(() => {
-    if (activeListId === 'completed' || filterStatus === 'todo') return []
+    if (activeListId === 'completed') return []
     let list = filterCompletedForSmartList(tasks, activeListId)
     if (filterListId !== 'all') list = list.filter((t) => t.listId === filterListId)
     if (filterPriority !== 'all') list = list.filter((t) => t.priority === filterPriority)

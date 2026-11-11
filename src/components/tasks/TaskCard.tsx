@@ -97,6 +97,7 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
   const setExpanded = useGraphiteStore((s) => s.setExpandedTaskId)
   const setSelected = useGraphiteStore((s) => s.setSelectedTaskId)
   const completeTask = useGraphiteStore((s) => s.completeTask)
+  const uncompleteTask = useGraphiteStore((s) => s.uncompleteTask)
   const toggleStar = useGraphiteStore((s) => s.toggleStar)
   const toggleSubtask = useGraphiteStore((s) => s.toggleSubtask)
   const duplicateTask = useGraphiteStore((s) => s.duplicateTask)
@@ -125,7 +126,10 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
   const isStarred = task.starred && !isDone
 
   const handleComplete = () => {
-    if (task.completed) return
+    if (task.completed) {
+      uncompleteTask(task.id)
+      return
+    }
     setCompleting(true)
     window.setTimeout(() => {
       completeTask(task.id)
@@ -346,7 +350,6 @@ export function TaskList() {
   const tasks = useVisibleTasks()
   const completedExtra = useCompletedSectionTasks()
   const activeListId = useGraphiteStore((s) => s.activeListId)
-  const filterStatus = useGraphiteStore((s) => s.filterStatus)
   const reorderTasks = useGraphiteStore((s) => s.reorderTasks)
 
   const [completedOpen, setCompletedOpen] = useState(true)
@@ -354,7 +357,7 @@ export function TaskList() {
   const isCompletedView = activeListId === 'completed'
   const openTasks = isCompletedView ? [] : tasks.filter((t) => !t.completed)
   const inlineCompleted = isCompletedView ? tasks : completedExtra
-  const showCompletedSection = !isCompletedView && filterStatus !== 'todo' && inlineCompleted.length > 0
+  const showCompletedSection = !isCompletedView && inlineCompleted.length > 0
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
 
