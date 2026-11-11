@@ -1,0 +1,69 @@
+export type Priority = 'high' | 'medium' | 'low' | 'none'
+
+export interface Subtask {
+  id: string
+  title: string
+  completed: boolean
+}
+
+export interface Task {
+  id: string
+  title: string
+  description: string
+  dueDate?: string
+  dueTime?: string
+  endTime?: string
+  priority: Priority
+  listId: string
+  tags: string[]
+  subtasks: Subtask[]
+  completed: boolean
+  starred: boolean
+  order: number
+  createdAt: string
+  completedAt?: string
+  updatedAt: string
+}
+
+export interface TaskList {
+  id: string
+  name: string
+  updatedAt: string
+}
+
+export interface Tombstone {
+  id: string
+  kind: 'task' | 'list' | 'file'
+  deletedAt: string
+}
+
+export type FilterStatus = 'all' | 'todo' | 'done'
+export type NavView = 'dashboard' | 'tasks' | 'calendar'
+
+export interface StoredFile {
+  id: string
+  name: string
+  size: number
+  contentType: string
+  pathname: string
+  uploadedAt: string
+  updatedAt: string
+  expiresAt: string
+  keepPinned?: boolean
+}
+
+export interface UndoAction {
+  id: string
+  label: string
+  undo: () => void
+  expiresAt: number
+}
+
+export interface PomodoroState {
+  workSeconds: number
+  breakSeconds: number
+  remaining: number
+  phase: 'work' | 'break'
+  running: boolean
+  focusTaskId?: string
+}
