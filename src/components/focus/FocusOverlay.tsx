@@ -1,7 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { X } from 'lucide-react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { GlassCard } from '../ui/GlassCard'
-import { PomodoroCard } from '../../features/focus/PomodoroCard'
+import { StopwatchCard } from '../../features/focus/StopwatchCard'
+import { IstClock } from '../layout/IstClock'
+import { Button } from '../ui/Button'
 
 export function FocusOverlay() {
   const focusMode = useGraphiteStore((s) => s.focusMode)
@@ -15,36 +18,44 @@ export function FocusOverlay() {
     <AnimatePresence>
       {focusMode && (
         <motion.div
-          className="fixed inset-0 z-[45]"
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
         >
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-xl"
-            aria-hidden
-            onClick={() => setFocusMode(false)}
-          />
+          <motion.div className="absolute inset-0 bg-black/50 backdrop-blur-xl" aria-hidden />
           <motion.div
-            className="relative z-[1] mx-auto flex h-full max-w-lg flex-col items-center justify-center gap-6 p-6"
-            initial={{ scale: 0.98 }}
-            animate={{ scale: 1 }}
+            className="glass-panel relative z-[1] flex w-full max-w-xl flex-col gap-6 p-6 md:p-8"
+            initial={{ scale: 0.97, y: 12 }}
+            animate={{ scale: 1, y: 0 }}
+            exit={{ scale: 0.97, y: 12 }}
           >
-            {task ? (
-              <GlassCard className="w-full p-6 text-center">
-                <p className="text-xs uppercase tracking-wider text-faint">Focus</p>
-                <h2 className="mt-2 text-2xl font-semibold text-heading">{task.title}</h2>
-                <p className="mt-3 text-sm text-muted">{task.description}</p>
-              </GlassCard>
-            ) : (
-              <GlassCard className="w-full p-6 text-center text-sm text-muted">
-                Select a task and press F to focus.
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-faint">Focus mode</p>
+                <h2 className="mt-1 text-xl font-semibold text-heading">
+                  {task ? task.title : 'Pick a task'}
+                </h2>
+              </div>
+              <Button variant="ghost" onClick={() => setFocusMode(false)} aria-label="Exit focus mode">
+                <X className="h-5 w-5" />
+                Exit
+              </Button>
+            </div>
+
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-lavender/15 bg-white/40 px-6 py-5 text-center">
+              <IstClock large />
+            </div>
+
+            {task && (
+              <GlassCard className="p-4 text-center">
+                <p className="text-sm text-muted">{task.description || 'No description'}</p>
               </GlassCard>
             )}
-            <motion.div className="w-full max-w-sm">
-              <PomodoroCard />
-            </motion.div>
-            <p className="text-xs text-faint">Press Esc to exit</p>
+
+            <StopwatchCard />
+
+            <p className="text-center text-xs text-faint">Press Esc to exit focus</p>
           </motion.div>
         </motion.div>
       )}

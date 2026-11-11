@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, Triangle } from 'lucide-react'
-import { PomodoroCard } from '../../features/focus/PomodoroCard'
+import { ChevronLeft, Focus, Triangle } from 'lucide-react'
+import { StopwatchCard } from '../../features/focus/StopwatchCard'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 
 const SMART_NAV = [
@@ -15,6 +15,8 @@ export function Sidebar() {
   const activeListId = useGraphiteStore((s) => s.activeListId)
   const setActiveListId = useGraphiteStore((s) => s.setActiveListId)
   const toggleSidebar = useGraphiteStore((s) => s.toggleSidebar)
+  const setFocusMode = useGraphiteStore((s) => s.setFocusMode)
+  const selectedTaskId = useGraphiteStore((s) => s.selectedTaskId)
 
   return (
     <aside
@@ -59,8 +61,16 @@ export function Sidebar() {
       )}
 
       {!collapsed && (
-        <motion.div layout className="min-h-0">
-          <PomodoroCard />
+        <motion.div layout className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => setFocusMode(true, selectedTaskId)}
+            className="focus-ring flex items-center justify-center gap-2 rounded-xl border border-lavender/25 bg-white/60 px-3 py-2.5 text-sm font-medium text-heading hover:bg-lavender-soft"
+          >
+            <Focus className="h-4 w-4 text-lavender" />
+            Open Focus
+          </button>
+          <StopwatchCard compact />
         </motion.div>
       )}
 

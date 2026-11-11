@@ -1,12 +1,14 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { STORAGE_KEY } from '../lib/constants'
+import { istTodayYmd } from '../lib/ist-time'
+import { graphitePersistStorage } from '../lib/persist-storage'
 import { createSeedTasks, SEED_LISTS } from '../lib/seed'
 import { buildTaskFromQuickAdd } from '../lib/nlp-parser'
 import { normalizeTask } from '../lib/normalize-task'
 import { filterTasksForSmartList, generateId } from '../lib/task-utils'
 import type {
-  PomodoroState,
+  StopwatchState,
   Priority,
   Task,
   StoredFile,
@@ -37,7 +39,7 @@ export interface GraphiteState {
   editingTaskId: string | null
   focusMode: boolean
   focusTaskId: string | null
-  pomodoro: PomodoroState
+  stopwatch: StopwatchState
   undoQueue: UndoAction[]
   quickAddDraft: string
 
@@ -60,6 +62,7 @@ export interface GraphiteState {
   completeTask: (id: string) => void
   uncompleteTask: (id: string) => void
   deleteTask: (id: string) => void
+  deleteAllCompleted: () => void
   duplicateTask: (id: string) => void
   toggleStar: (id: string) => void
   reorderTasks: (orderedIds: string[]) => void
@@ -74,19 +77,16 @@ export interface GraphiteState {
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
 
-  tickPomodoro: () => void
-  startPomodoro: (taskId?: string) => void
-  pausePomodoro: () => void
-  resetPomodoro: () => void
-  setPomodoroFocusTask: (taskId: string | null) => void
+  tickStopwatch: () => void
+  startStopwatch: (taskId?: string) => void
+  pauseStopwatch: () => void
+  resetStopwatch: () => void
+  setStopwatchFocusTask: (taskId: string | null) => void
 
 }
 
-const defaultPomodoro: PomodoroState = {
-  workSeconds: 25 * 60,
-  breakSeconds: 5 * 60,
-  remaining: 25 * 60,
-  phase: 'work',
+const defaultStopwatch: StopwatchState = {
+  elapsedSeconds: 0,
   running: false,
 }
 
@@ -123,7 +123,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       editingTaskId: null,
       focusMode: false,
       focusTaskId: null,
-      pomodoro: { ...defaultPomodoro },
+      stopwatch: { ...defaultStopwatch },
       undoQueue: [],
       quickAddDraft: '',
 
@@ -153,9 +153,12 @@ export const useGraphiteStore = create<GraphiteState>()(
           active === 'inbox'
             ? 'work'
             : active
+        let dueDate = parsed.dueDate
+        if (!dueDate && active === 'today') dueDate = istTodayYmd()
+        if (!dueDate && active === 'upcoming') dueDate = istTodayYmd()
         return get().addTask({
           title: parsed.title,
-          dueDate: parsed.dueDate,
+          dueDate,
           dueTime: parsed.dueTime,
           priority: parsed.priority,
           listId,
@@ -216,6 +219,25 @@ export const useGraphiteStore = create<GraphiteState>()(
               : t,
           ),
         })),
+
+      deleteAllCompleted: () => {
+        const completed = get().tasks.filter((t) => t.completed)
+        if (completed.length === 0) return
+        const deletedAt = nowIso()
+        set((s) => ({
+          tasks: s.tasks.filter((t) => !t.completed),
+          tombstones: [
+            ...s.tombstones.filter(
+              (t) => !completed.some((c) => c.id === t.id && t.kind === 'task'),
+            ),
+            ...completed.map((t) => ({
+              id: t.id,
+              kind: 'task' as const,
+              deletedAt,
+            })),
+          ],
+        }))
+      },
 
       deleteTask: (id) => {
         const prev = get().tasks.find((t) => t.id === id)
@@ -336,45 +358,39 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       popUndo: (id) => set((s) => ({ undoQueue: s.undoQueue.filter((u) => u.id !== id) })),
 
-      tickPomodoro: () => {
-        const p = get().pomodoro
-        if (!p.running) return
-        if (p.remaining <= 1) {
-          const nextPhase = p.phase === 'work' ? 'break' : 'work'
-          const nextRemaining = nextPhase === 'work' ? p.workSeconds : p.breakSeconds
-          set({ pomodoro: { ...p, phase: nextPhase, remaining: nextRemaining } })
-        } else {
-          set({ pomodoro: { ...p, remaining: p.remaining - 1 } })
-        }
+      tickStopwatch: () => {
+        const sw = get().stopwatch
+        if (!sw.running) return
+        set({ stopwatch: { ...sw, elapsedSeconds: sw.elapsedSeconds + 1 } })
       },
 
-      startPomodoro: (taskId) =>
+      startStopwatch: (taskId) =>
         set((s) => ({
-          pomodoro: {
-            ...s.pomodoro,
+          stopwatch: {
+            ...s.stopwatch,
             running: true,
-            focusTaskId: taskId ?? s.pomodoro.focusTaskId ?? s.selectedTaskId ?? undefined,
+            focusTaskId: taskId ?? s.stopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
           },
         })),
 
-      pausePomodoro: () => set((s) => ({ pomodoro: { ...s.pomodoro, running: false } })),
+      pauseStopwatch: () => set((s) => ({ stopwatch: { ...s.stopwatch, running: false } })),
 
-      resetPomodoro: () =>
+      resetStopwatch: () =>
         set((s) => ({
-          pomodoro: {
-            ...s.pomodoro,
+          stopwatch: {
+            ...s.stopwatch,
             running: false,
-            phase: 'work',
-            remaining: s.pomodoro.workSeconds,
+            elapsedSeconds: 0,
           },
         })),
 
-      setPomodoroFocusTask: (taskId) =>
-        set((s) => ({ pomodoro: { ...s.pomodoro, focusTaskId: taskId ?? undefined } })),
+      setStopwatchFocusTask: (taskId) =>
+        set((s) => ({ stopwatch: { ...s.stopwatch, focusTaskId: taskId ?? undefined } })),
 
     }),
     {
       name: STORAGE_KEY,
+      storage: createJSONStorage(() => graphitePersistStorage),
       partialize: (s) => ({
         seeded: s.seeded,
         tasks: s.tasks,

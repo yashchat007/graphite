@@ -48,11 +48,8 @@ export interface UndoAction {
   expiresAt: number
 }
 
-export interface PomodoroState {
-  workSeconds: number
-  breakSeconds: number
-  remaining: number
-  phase: 'work' | 'break'
+export interface StopwatchState {
+  elapsedSeconds: number
   running: boolean
   focusTaskId?: string
 }

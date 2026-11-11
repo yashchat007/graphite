@@ -1,14 +1,15 @@
-import { addDays, format, isSameDay, parseISO, startOfDay } from 'date-fns'
+import { addDays, format, parseISO } from 'date-fns'
+import { istStartOfToday, istTodayYmd, istTomorrowYmd } from './ist-time'
 import type { Task } from './types'
 
 export function isDueToday(task: Task): boolean {
   if (!task.dueDate) return false
-  return isSameDay(parseISO(task.dueDate), new Date())
+  return task.dueDate === istTodayYmd()
 }
 
 export function isDueTomorrow(task: Task): boolean {
   if (!task.dueDate) return false
-  return isSameDay(parseISO(task.dueDate), addDays(new Date(), 1))
+  return task.dueDate === istTomorrowYmd()
 }
 
 export function dueLabel(task: Task): string {
@@ -19,14 +20,14 @@ export function dueLabel(task: Task): string {
 }
 
 export function filterTasksForSmartList(tasks: Task[], listId: string): Task[] {
-  const now = startOfDay(new Date())
+  const now = istStartOfToday()
   const in7 = addDays(now, 7)
 
   switch (listId) {
     case 'inbox':
       return tasks.filter((t) => !t.completed && t.listId === 'inbox')
     case 'today':
-      return tasks.filter((t) => !t.completed && t.dueDate && isSameDay(parseISO(t.dueDate), now))
+      return tasks.filter((t) => !t.completed && t.dueDate && t.dueDate === istTodayYmd())
     case 'upcoming':
       return tasks.filter((t) => {
         if (t.completed || !t.dueDate) return false
@@ -43,16 +44,14 @@ export function filterTasksForSmartList(tasks: Task[], listId: string): Task[] {
 }
 
 export function filterCompletedForSmartList(tasks: Task[], listId: string): Task[] {
-  const now = startOfDay(new Date())
+  const now = istStartOfToday()
   const in7 = addDays(now, 7)
 
   if (listId === 'completed') return []
 
   switch (listId) {
     case 'today':
-      return tasks.filter(
-        (t) => t.completed && t.dueDate && isSameDay(parseISO(t.dueDate), now),
-      )
+      return tasks.filter((t) => t.completed && t.dueDate && t.dueDate === istTodayYmd())
     case 'upcoming':
       return tasks.filter((t) => {
         if (!t.completed || !t.dueDate) return false
