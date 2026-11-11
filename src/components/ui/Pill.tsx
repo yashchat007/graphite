@@ -20,7 +20,7 @@ export const Pill = forwardRef<HTMLButtonElement, PillProps>(function Pill(
       className={`focus-ring inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
         active
           ? 'border-glass surface-soft text-heading'
-          : 'border-glass bg-[var(--theme-input-bg)] text-muted hover:surface-soft hover:text-body'
+          : 'border-glass bg-[var(--aurora-input-bg)] text-muted hover:surface-soft hover:text-body'
       }`}
     >
       <span>{label}</span>

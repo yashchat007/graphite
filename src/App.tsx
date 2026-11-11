@@ -20,13 +20,11 @@ import { nowIso } from './lib/sync-document'
 import { createSeedTasks } from './lib/seed'
 import { AccessKeyGate } from './components/auth/AccessKeyGate'
 import { useSyncEngine } from './hooks/useSyncEngine'
-import { useAppTheme } from './hooks/useAppTheme'
 import { useGraphiteStore } from './store/useGraphiteStore'
 
 export default function App() {
   const hydrated = useGraphiteStore((s) => s.hydrated)
   const setHydrated = useGraphiteStore((s) => s.setHydrated)
-  useAppTheme()
   useKeyboardShortcuts()
   useSyncEngine()
 

@@ -26,7 +26,7 @@ export function GlassCard({
           ? {
               y: -2,
               boxShadow:
-                'inset 0 1px 0 0 var(--theme-glass-highlight), 0 16px 48px var(--theme-glass-shadow), 0 6px 16px color-mix(in srgb, var(--theme-glass-shadow) 70%, transparent)',
+                'inset 0 1px 0 0 var(--aurora-glass-highlight), 0 16px 48px var(--aurora-glass-shadow), 0 6px 16px rgba(109, 91, 208, 0.1)',
             }
           : undefined
       }
@@ -57,7 +57,7 @@ export function GlassCard({
           aria-hidden
           className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(600px circle at var(--mx) var(--my), var(--theme-cursor-glow), transparent 42%)`,
+            background: `radial-gradient(600px circle at var(--mx) var(--my), var(--aurora-cursor-glow), transparent 42%)`,
           }}
         />
       )}

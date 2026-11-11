@@ -10,7 +10,7 @@ export function Hero() {
     >
       <h1 className="text-3xl font-semibold tracking-tight text-heading md:text-4xl">
         Make things{' '}
-        <em className="font-serif text-[2.25rem] font-normal italic text-lavender md:text-[2.5rem]">
+        <em className="font-serif text-[2.25rem] font-normal italic text-[#6D5BD0] md:text-[2.5rem]">
           simple
         </em>
         .

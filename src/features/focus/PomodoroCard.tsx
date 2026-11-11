@@ -48,7 +48,7 @@ export function PomodoroCard() {
               cy="60"
               r="54"
               fill="none"
-              stroke="var(--theme-timer-track)"
+              stroke="var(--aurora-timer-track)"
               strokeWidth="8"
             />
             <motion.circle
@@ -65,8 +65,8 @@ export function PomodoroCard() {
             />
             <defs>
               <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop stopColor="var(--theme-timer-from)" />
-                <stop offset="1" stopColor="var(--theme-timer-to)" />
+                <stop stopColor="var(--aurora-timer-ring)" />
+                <stop offset="1" stopColor="var(--aurora-accent)" />
               </linearGradient>
             </defs>
           </svg>

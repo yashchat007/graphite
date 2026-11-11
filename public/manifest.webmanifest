@@ -4,7 +4,7 @@
   "description": "Calm task dashboard with cross-device sync",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#EEF0FA",
+  "background_color": "#E6DEFA",
   "theme_color": "#6D5BD0",
   "orientation": "portrait-primary",
   "icons": [

@@ -15,7 +15,6 @@ import type {
   UndoAction,
 } from '../lib/types'
 import { nowIso } from '../lib/sync-document'
-import { DEFAULT_UI_THEME, type UiTheme } from '../lib/themes'
 
 export interface GraphiteState {
   hydrated: boolean
@@ -41,7 +40,6 @@ export interface GraphiteState {
   pomodoro: PomodoroState
   undoQueue: UndoAction[]
   quickAddDraft: string
-  uiTheme: UiTheme
 
   setHydrated: (v: boolean) => void
   setActiveListId: (id: string) => void
@@ -55,7 +53,6 @@ export interface GraphiteState {
   setTaskModalOpen: (v: boolean, editingId?: string | null) => void
   setFocusMode: (on: boolean, taskId?: string | null) => void
   setQuickAddDraft: (d: string) => void
-  setUiTheme: (theme: UiTheme) => void
 
   addTaskFromQuickAdd: (input: string) => string
   addTask: (partial: Partial<Task> & { title: string }) => string
@@ -129,7 +126,6 @@ export const useGraphiteStore = create<GraphiteState>()(
       pomodoro: { ...defaultPomodoro },
       undoQueue: [],
       quickAddDraft: '',
-      uiTheme: DEFAULT_UI_THEME,
 
       setHydrated: (v) => set({ hydrated: v }),
       setActiveListId: (id) => set({ activeListId: id }),
@@ -145,7 +141,6 @@ export const useGraphiteStore = create<GraphiteState>()(
       setFocusMode: (on, taskId = null) =>
         set({ focusMode: on, focusTaskId: on ? taskId ?? get().selectedTaskId : null }),
       setQuickAddDraft: (d) => set({ quickAddDraft: d }),
-      setUiTheme: (uiTheme) => set({ uiTheme }),
 
       addTaskFromQuickAdd: (input) => {
         const parsed = buildTaskFromQuickAdd(input)
@@ -389,7 +384,6 @@ export const useGraphiteStore = create<GraphiteState>()(
         tombstones: s.tombstones,
         files: s.files,
         sidebarCollapsed: s.sidebarCollapsed,
-        uiTheme: s.uiTheme,
       }),
       onRehydrateStorage: () => (state) => {
         if (!state) return
@@ -400,9 +394,6 @@ export const useGraphiteStore = create<GraphiteState>()(
         }
         if (!state.seeded || state.tasks.length === 0) {
           useGraphiteStore.setState({ tasks: createSeedTasks(), seeded: true })
-        }
-        if (!state.uiTheme) {
-          useGraphiteStore.setState({ uiTheme: DEFAULT_UI_THEME })
         }
       },
     },

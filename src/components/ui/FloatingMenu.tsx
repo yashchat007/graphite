@@ -73,7 +73,7 @@ export function FloatingMenu({
   return createPortal(
   <div
       ref={menuRef}
-      className={`glass-panel fixed z-[500] p-1 shadow-xl ${className}`}
+      className={`glass-menu fixed z-[500] rounded-2xl p-1 ${className}`}
       style={{ top: style.top, left: style.left, minWidth }}
       role="menu"
     >

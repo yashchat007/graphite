@@ -14,7 +14,7 @@ export function Button({ variant = 'ghost', children, className = '', ...props }
     'focus-ring inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40'
   const styles: Record<Variant, string> = {
     primary:
-      'lavender-gradient text-white shadow-md shadow-[color-mix(in_srgb,var(--theme-accent)_35%,transparent)] hover:brightness-105 relative overflow-hidden',
+      'lavender-gradient text-white shadow-md shadow-[rgba(109,91,208,0.35)] hover:brightness-105 relative overflow-hidden',
     ghost: 'text-body hover:surface-soft border border-transparent hover:border-glass',
     subtle: 'text-muted hover:text-heading hover:surface-soft',
   }

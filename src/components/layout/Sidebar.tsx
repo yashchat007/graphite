@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
-import { ChevronLeft, Palette, Triangle } from 'lucide-react'
+import { ChevronLeft, Triangle } from 'lucide-react'
 import { PomodoroCard } from '../../features/focus/PomodoroCard'
-import { nextUiTheme, UI_THEMES } from '../../lib/themes'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 
 const SMART_NAV = [
@@ -14,12 +13,8 @@ const SMART_NAV = [
 export function Sidebar() {
   const collapsed = useGraphiteStore((s) => s.sidebarCollapsed)
   const activeListId = useGraphiteStore((s) => s.activeListId)
-  const uiTheme = useGraphiteStore((s) => s.uiTheme)
   const setActiveListId = useGraphiteStore((s) => s.setActiveListId)
-  const setUiTheme = useGraphiteStore((s) => s.setUiTheme)
   const toggleSidebar = useGraphiteStore((s) => s.toggleSidebar)
-
-  const themeLabel = UI_THEMES.find((t) => t.id === uiTheme)?.label ?? 'Aurora'
 
   return (
     <aside
@@ -31,7 +26,7 @@ export function Sidebar() {
           layout
           className="glass-panel flex h-10 w-10 items-center justify-center rounded-xl !p-0 shadow-none"
         >
-          <Triangle className="h-4 w-4 text-lavender-light" strokeWidth={1.5} />
+          <Triangle className="h-4 w-4 text-lavender" strokeWidth={1.5} />
         </motion.div>
         {!collapsed && (
           <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -69,21 +64,7 @@ export function Sidebar() {
         </motion.div>
       )}
 
-      <div className="mt-auto flex flex-col gap-2">
-        {!collapsed && (
-          <button
-            type="button"
-            onClick={() => setUiTheme(nextUiTheme(uiTheme))}
-            className="focus-ring flex items-center gap-2 rounded-xl border border-glass px-3 py-2 text-left text-[11px] text-muted hover:surface-soft"
-            aria-label={`Theme: ${themeLabel}. Click to change.`}
-            title={`Theme: ${themeLabel}`}
-          >
-            <Palette className="h-3.5 w-3.5 shrink-0 text-faint" aria-hidden />
-            <span className="truncate">
-              <span className="text-faint">Theme</span> · {themeLabel}
-            </span>
-          </button>
-        )}
+      <div className="mt-auto">
         <button
           type="button"
           onClick={toggleSidebar}

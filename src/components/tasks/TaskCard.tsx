@@ -29,7 +29,7 @@ import { GlassCard } from '../ui/GlassCard'
 
 function PriorityDot({ task }: { task: Task }) {
   const isToday = dueLabel(task) === 'Today'
-  const color = isToday ? 'var(--theme-sage)' : priorityColor(task.priority)
+  const color = isToday ? 'var(--aurora-accent)' : priorityColor(task.priority)
   return (
     <span
       className="inline-block h-2 w-2 shrink-0 rounded-full"
@@ -65,7 +65,9 @@ function TaskCheckbox({
         onComplete()
       }}
       className={`focus-ring relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${
-        done ? '' : 'border border-glass bg-[var(--theme-input-bg)]'
+        done
+          ? ''
+          : 'border border-[color-mix(in_srgb,var(--aurora-accent)_32%,white)] bg-[var(--aurora-input-bg)]'
       }`}
       style={done ? { backgroundColor: VAR_COMPLETE } : undefined}
     >
@@ -140,13 +142,13 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
       hoverLift={!isDone}
       cursorGlow={!isDone}
       className={`group p-4 md:p-5 ${sortable ? 'cursor-grab active:cursor-grabbing' : ''} ${
-        selected ? 'ring-1 ring-[color-mix(in_srgb,var(--theme-accent)_45%,transparent)]' : ''
+        selected ? 'ring-1 ring-[color-mix(in_srgb,var(--aurora-accent)_45%,transparent)]' : ''
       } ${isStarred ? 'border-l-2 pl-[calc(1rem-2px)] md:pl-[calc(1.25rem-2px)]' : ''}`}
       style={
         isStarred
           ? {
               borderLeftColor: VAR_STARRED,
-              boxShadow: 'inset 4px 0 24px color-mix(in srgb, var(--theme-starred) 28%, transparent)',
+              boxShadow: 'inset 4px 0 24px color-mix(in srgb, var(--aurora-starred) 28%, transparent)',
             }
           : undefined
       }
