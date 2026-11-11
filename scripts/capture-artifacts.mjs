@@ -1,6 +1,5 @@
 import { chromium } from 'playwright'
-import { mkdir } from 'fs/promises'
-import { readdir } from 'fs/promises'
+import { mkdir, readdir } from 'fs/promises'
 
 const BASE = 'http://127.0.0.1:43123'
 const OUT = '/opt/cursor/artifacts'
@@ -8,8 +7,9 @@ const OUT = '/opt/cursor/artifacts'
 await mkdir(OUT, { recursive: true })
 
 const browser = await chromium.launch()
-const context = await browser.newContext()
-const page = await context.newPage()
+const page = await browser.newPage()
+
+const waitHero = () => page.getByRole('heading', { name: /Make things/i }).waitFor({ timeout: 20000 })
 
 await page.addInitScript(() => localStorage.clear())
 
@@ -17,7 +17,7 @@ await page.goto(BASE, { waitUntil: 'networkidle' })
 await page.getByText('Enter access key').waitFor({ timeout: 15000 })
 await page.getByLabel('Access key').fill('dev-local-key')
 await page.getByRole('button', { name: 'Continue' }).click()
-await page.getByText('Make things', { exact: false }).waitFor({ timeout: 15000 })
+await waitHero()
 
 await page.evaluate(() => {
   const key = 'graphite-store-v1'
@@ -51,12 +51,11 @@ await page.evaluate(() => {
 })
 
 await page.reload({ waitUntil: 'networkidle' })
-await page.getByText('Make things', { exact: false }).waitFor({ timeout: 15000 })
+await waitHero()
 await page.waitForTimeout(800)
 
 await page.setViewportSize({ width: 1440, height: 900 })
-await page.screenshot({ path: `${OUT}/graphite-dashboard-states-1440x900.png`, fullPage: false })
-
+await page.screenshot({ path: `${OUT}/graphite-dashboard-states-1440x900.png` })
 await page.screenshot({ path: `${OUT}/graphite-my-files-1440x900.png`, clip: { x: 900, y: 120, width: 520, height: 420 } })
 
 await page.setViewportSize({ width: 390, height: 844 })
@@ -64,4 +63,7 @@ await page.waitForTimeout(500)
 await page.screenshot({ path: `${OUT}/graphite-mobile-390x844.png` })
 
 await browser.close()
-console.log('Artifacts (mock files — Blob not configured in VM):', (await readdir(OUT)).filter((f) => f.endsWith('.png')).join(', '))
+console.log(
+  'Artifacts (My files mocked — no BLOB_READ_WRITE_TOKEN in VM):',
+  (await readdir(OUT)).filter((f) => f.endsWith('graphite-') && f.endsWith('.png')).join(', '),
+)
