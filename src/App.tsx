@@ -19,6 +19,7 @@ import { defaultExpiresAt, normalizeStoredFile, pruneStoredFiles } from './lib/f
 import { nowIso } from './lib/sync-document'
 import { createSeedTasks } from './lib/seed'
 import { AccessKeyGate } from './components/auth/AccessKeyGate'
+import { useFocusStopwatchClock } from './hooks/useFocusStopwatchClock'
 import { useSyncEngine } from './hooks/useSyncEngine'
 import { useGraphiteStore } from './store/useGraphiteStore'
 
@@ -27,6 +28,7 @@ export default function App() {
   const setHydrated = useGraphiteStore((s) => s.setHydrated)
   useKeyboardShortcuts()
   useSyncEngine()
+  useFocusStopwatchClock()
 
   useEffect(() => {
     const finish = () => {

@@ -17,6 +17,7 @@ import type {
   UndoAction,
 } from '../lib/types'
 import { nowIso } from '../lib/sync-document'
+import { stopwatchPause, stopwatchReset, stopwatchStart } from '../lib/stopwatch'
 
 export interface GraphiteState {
   hydrated: boolean
@@ -39,6 +40,8 @@ export interface GraphiteState {
   focusMode: boolean
   focusTaskId: string | null
   stopwatch: StopwatchState
+  /** Bumped by the app-level stopwatch clock so timer UIs re-render without local intervals. */
+  stopwatchClockMs: number
   undoQueue: UndoAction[]
   quickAddDraft: string
 
@@ -76,7 +79,7 @@ export interface GraphiteState {
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
 
-  tickStopwatch: () => void
+  syncStopwatch: (now?: number) => void
   startStopwatch: (taskId?: string) => void
   pauseStopwatch: () => void
   resetStopwatch: () => void
@@ -85,8 +88,9 @@ export interface GraphiteState {
 }
 
 const defaultStopwatch: StopwatchState = {
-  elapsedSeconds: 0,
   running: false,
+  accumulatedMs: 0,
+  startedAt: null,
 }
 
 export function applyTaskFilters(
@@ -122,6 +126,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       focusMode: false,
       focusTaskId: null,
       stopwatch: { ...defaultStopwatch },
+      stopwatchClockMs: 0,
       undoQueue: [],
       quickAddDraft: '',
 
@@ -355,34 +360,43 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       popUndo: (id) => set((s) => ({ undoQueue: s.undoQueue.filter((u) => u.id !== id) })),
 
-      tickStopwatch: () => {
-        const sw = get().stopwatch
-        if (!sw.running) return
-        set({ stopwatch: { ...sw, elapsedSeconds: sw.elapsedSeconds + 1 } })
+      syncStopwatch: (now = Date.now()) => {
+        set({ stopwatchClockMs: now })
       },
 
       startStopwatch: (taskId) =>
-        set((s) => ({
-          stopwatch: {
-            ...s.stopwatch,
-            running: true,
-            focusTaskId: taskId ?? s.stopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
-          },
-        })),
+        set((s) => {
+          const now = Date.now()
+          const stopwatch = stopwatchStart(
+            {
+              ...s.stopwatch,
+              focusTaskId:
+                taskId ?? s.stopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
+            },
+            now,
+          )
+          return { stopwatch, stopwatchClockMs: now }
+        }),
 
-      pauseStopwatch: () => set((s) => ({ stopwatch: { ...s.stopwatch, running: false } })),
+      pauseStopwatch: () =>
+        set((s) => {
+          const now = Date.now()
+          return {
+            stopwatch: stopwatchPause(s.stopwatch, now),
+            stopwatchClockMs: now,
+          }
+        }),
 
       resetStopwatch: () =>
         set((s) => ({
-          stopwatch: {
-            ...s.stopwatch,
-            running: false,
-            elapsedSeconds: 0,
-          },
+          stopwatch: stopwatchReset(s.stopwatch),
+          stopwatchClockMs: Date.now(),
         })),
 
       setStopwatchFocusTask: (taskId) =>
-        set((s) => ({ stopwatch: { ...s.stopwatch, focusTaskId: taskId ?? undefined } })),
+        set((s) => ({
+          stopwatch: { ...s.stopwatch, focusTaskId: taskId ?? undefined },
+        })),
 
     }),
     {

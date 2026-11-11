@@ -49,7 +49,10 @@ export interface UndoAction {
 }
 
 export interface StopwatchState {
-  elapsedSeconds: number
   running: boolean
+  /** Total elapsed ms from completed run segments. */
+  accumulatedMs: number
+  /** Wall-clock ms when the current run segment started; null while paused. */
+  startedAt: number | null
   focusTaskId?: string
 }
