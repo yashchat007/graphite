@@ -4,7 +4,7 @@ A glassmorphism task dashboard for capturing work, staying in focus, and syncing
 
 ## Built with
 
-React, Vite, TypeScript, Tailwind CSS, Framer Motion, Zustand, Vercel serverless functions, Upstash Redis, Vercel Blob, and a installable PWA.
+React, Vite, TypeScript, Tailwind CSS, Framer Motion, Zustand, Vercel serverless functions, Upstash Redis, Vercel Blob, and an installable PWA.
 
 ## Features
 
