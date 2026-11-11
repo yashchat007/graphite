@@ -83,7 +83,7 @@ export function FilterRow() {
           ))}
         </FloatingMenu>
       </div>
-      <Button variant="primary" className="group" onClick={() => setTaskModalOpen(true, null)}>
+      <Button variant="primary" className="group" onClick={() => setTaskModalOpen(true)}>
         <Plus className="h-4 w-4" />
         New task
       </Button>

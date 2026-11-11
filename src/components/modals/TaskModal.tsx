@@ -11,14 +11,9 @@ const fieldClass =
 
 export function TaskModal() {
   const open = useGraphiteStore((s) => s.taskModalOpen)
-  const editingId = useGraphiteStore((s) => s.editingTaskId)
-  const tasks = useGraphiteStore((s) => s.tasks)
   const lists = useGraphiteStore((s) => s.lists)
   const setTaskModalOpen = useGraphiteStore((s) => s.setTaskModalOpen)
   const addTask = useGraphiteStore((s) => s.addTask)
-  const updateTask = useGraphiteStore((s) => s.updateTask)
-
-  const existing = editingId ? tasks.find((t) => t.id === editingId) : undefined
   const activeListId = useGraphiteStore((s) => s.activeListId)
 
   const [title, setTitle] = useState('')
@@ -30,38 +25,27 @@ export function TaskModal() {
 
   useEffect(() => {
     if (!open) return
-    if (existing) {
-      setTitle(existing.title)
-      setDescription(existing.description)
-      setDueDate(existing.dueDate ?? '')
-      setDueTime(existing.dueTime ?? '')
-      setPriority(existing.priority)
-      setListId(existing.listId)
-    } else {
-      const defaultDue =
-        activeListId === 'today' || activeListId === 'upcoming' ? istTodayYmd() : ''
-      setTitle('')
-      setDescription('')
-      setDueDate(defaultDue)
-      setDueTime('')
-      setPriority('none')
-      setListId('work')
-    }
-  }, [open, existing, activeListId])
+    const defaultDue =
+      activeListId === 'today' || activeListId === 'upcoming' ? istTodayYmd() : ''
+    setTitle('')
+    setDescription('')
+    setDueDate(defaultDue)
+    setDueTime('')
+    setPriority('none')
+    setListId('work')
+  }, [open, activeListId])
 
   const save = () => {
     if (!title.trim()) return
-    const payload = {
+    addTask({
       title: title.trim(),
       description,
       dueDate: dueDate || undefined,
       dueTime: dueTime || undefined,
       priority,
       listId,
-    }
-    if (existing) updateTask(existing.id, payload)
-    else addTask(payload)
-    setTaskModalOpen(false, null)
+    })
+    setTaskModalOpen(false)
   }
 
   return (
@@ -77,7 +61,7 @@ export function TaskModal() {
             type="button"
             aria-label="Close modal"
             className="modal-overlay absolute inset-0 backdrop-blur-md"
-            onClick={() => setTaskModalOpen(false, null)}
+            onClick={() => setTaskModalOpen(false)}
           />
           <motion.div
             role="dialog"
@@ -91,12 +75,12 @@ export function TaskModal() {
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 id="task-modal-title" className="text-lg font-semibold text-heading">
-                {existing ? 'Edit task' : 'New task'}
+                New task
               </h2>
               <button
                 type="button"
                 aria-label="Close"
-                onClick={() => setTaskModalOpen(false, null)}
+                onClick={() => setTaskModalOpen(false)}
                 className="focus-ring rounded-lg p-1 text-muted hover:bg-lavender-soft"
               >
                 <X className="h-5 w-5" />
@@ -120,7 +104,7 @@ export function TaskModal() {
             />
 
             <div className="mt-6 flex justify-end gap-2">
-              <Button variant="ghost" onClick={() => setTaskModalOpen(false, null)}>
+              <Button variant="ghost" onClick={() => setTaskModalOpen(false)}>
                 Cancel
               </Button>
               <Button variant="primary" onClick={save}>
