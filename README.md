@@ -23,7 +23,15 @@ npm run dev
 
 Open the URL Vite prints (default port **43123**).
 
-Copy `.env.example` to `.env` for local API testing. On Vercel, set `APP_SECRET` plus Upstash/`KV_*` Redis variables in the project **Environment Variables** settings (same `APP_SECRET` on laptop and phone).
+Copy `.env.example` to `.env` for local API testing.
+
+### Vercel deploy checklist
+
+1. Import the repo, leave **Build Command** `npm run build` and **Output Directory** `dist` (or use repo `vercel.json`).
+2. Set **Environment Variables** for Production (and Preview if needed): `APP_SECRET`, `KV_REST_API_URL`, `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_*`), `BLOB_READ_WRITE_TOKEN`, `CRON_SECRET`.
+3. Enable **Vercel Cron** on the project (Hobby+: daily job in `vercel.json` → `/api/files/cleanup`).
+4. Deploy; confirm `/api/sync` and static routes work. SPA rewrites skip `/api/*`.
+5. Use the same `APP_SECRET` in the access-key screen on each device.
 
 ```bash
 npm run build   # typecheck + static dist/

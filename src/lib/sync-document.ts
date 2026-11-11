@@ -1,5 +1,6 @@
 import type { SyncDocument, SyncFile, SyncList, SyncTask, Tombstone } from '../../shared/sync-types'
 import type { StoredFile, Task, TaskList } from './types'
+import { defaultExpiresAt, normalizeStoredFile } from './file-expiry'
 
 export type { SyncDocument, Tombstone }
 
@@ -33,7 +34,12 @@ export function syncToList(list: SyncList): TaskList & { updatedAt: string } {
 }
 
 export function fileToSync(file: StoredFile): SyncFile {
-  return { ...file, updatedAt: file.updatedAt ?? file.uploadedAt }
+  const n = normalizeStoredFile(file)
+  return {
+    ...n,
+    updatedAt: n.updatedAt ?? n.uploadedAt,
+    expiresAt: n.expiresAt ?? defaultExpiresAt(n.uploadedAt),
+  }
 }
 
 export function syncToFile(file: SyncFile): StoredFile {

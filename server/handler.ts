@@ -2,7 +2,9 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import { documentFromClient, mergeDocuments } from '../shared/sync-merge'
 import type { SyncDocument } from '../shared/sync-types'
 import { assertAuthorized } from './auth'
-import { loadRemoteState, redisConfigured, saveRemoteState } from './redis'
+import { loadPrunedRemoteState } from './load-pruned-state'
+import { pruneExpiredFiles } from './file-expiry'
+import { redisConfigured, saveRemoteState } from './redis'
 
 async function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -46,8 +48,7 @@ export async function handleSyncApi(req: IncomingMessage, res: ServerResponse): 
 
   try {
     if (req.method === 'GET') {
-      const stored = (await loadRemoteState()) as SyncDocument | null
-      const document = documentFromClient(stored ?? undefined)
+      const document = await loadPrunedRemoteState()
       sendJson(res, 200, { localOnly: false, document })
       return
     }
@@ -56,10 +57,11 @@ export async function handleSyncApi(req: IncomingMessage, res: ServerResponse): 
       const raw = await readBody(req)
       const payload = JSON.parse(raw || '{}') as { document?: Partial<SyncDocument> }
       const clientDoc = documentFromClient(payload.document)
-      const stored = documentFromClient((await loadRemoteState()) as Partial<SyncDocument> | null)
+      const stored = await loadPrunedRemoteState()
       const merged = mergeDocuments(stored, clientDoc)
-      await saveRemoteState(merged)
-      sendJson(res, 200, { localOnly: false, document: merged })
+      const { document: pruned } = await pruneExpiredFiles(merged)
+      await saveRemoteState(pruned)
+      sendJson(res, 200, { localOnly: false, document: pruned })
       return
     }
 

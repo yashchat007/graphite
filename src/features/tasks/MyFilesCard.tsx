@@ -1,6 +1,7 @@
-import { File as FileIcon, FileText, Image as ImageIcon, Loader2, Trash2, Upload } from 'lucide-react'
+import { File as FileIcon, FileText, Image as ImageIcon, Loader2, Pin, Trash2, Upload } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react'
-import { formatFileSize, formatUploadedAgo, fileIconKind } from '../../lib/file-format'
+import { formatExpiresIn, formatFileSize, formatUploadedAgo, fileIconKind } from '../../lib/file-format'
+import { normalizeStoredFile } from '../../lib/file-expiry'
 import { deleteRemoteFile, fetchBlobStatus, openStoredFile, uploadFile } from '../../lib/files-api'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { useSyncStore } from '../../store/useSyncStore'
@@ -19,6 +20,7 @@ export function MyFilesCard() {
   const files = useGraphiteStore((s) => s.files)
   const addFile = useGraphiteStore((s) => s.addFile)
   const removeFile = useGraphiteStore((s) => s.removeFile)
+  const toggleFileKeep = useGraphiteStore((s) => s.toggleFileKeep)
   const accessKey = useSyncStore((s) => s.accessKey)
 
   const [blobReady, setBlobReady] = useState<boolean | null>(null)
@@ -122,7 +124,10 @@ export function MyFilesCard() {
         <p className="text-xs text-[#5A5A60]">No files yet.</p>
       ) : (
         <ul className="max-h-56 space-y-2 overflow-y-auto">
-          {files.map((f) => (
+          {files.map((raw) => {
+            const f = normalizeStoredFile(raw)
+            const expiresLabel = formatExpiresIn(f)
+            return (
             <li
               key={f.id}
               className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm"
@@ -137,7 +142,18 @@ export function MyFilesCard() {
                 <p className="text-[10px] text-[#5A5A60]">
                   {formatFileSize(f.size)}
                   {formatUploadedAgo(f.uploadedAt) ? ` · ${formatUploadedAgo(f.uploadedAt)}` : ''}
+                  {expiresLabel ? ` · ${expiresLabel}` : f.keepPinned ? ' · kept' : ''}
                 </p>
+              </button>
+              <button
+                type="button"
+                aria-label={f.keepPinned ? 'Unpin file' : 'Keep file'}
+                aria-pressed={f.keepPinned}
+                title={f.keepPinned ? 'Kept — won’t expire' : 'Keep'}
+                className={`focus-ring rounded-lg p-1 ${f.keepPinned ? 'text-[#C7C7CC]' : 'text-[#5A5A60] hover:text-[#8A8A8F]'}`}
+                onClick={() => toggleFileKeep(f.id)}
+              >
+                <Pin className={`h-3.5 w-3.5 ${f.keepPinned ? 'fill-current' : ''}`} />
               </button>
               <button
                 type="button"
@@ -153,7 +169,7 @@ export function MyFilesCard() {
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
             </li>
-          ))}
+          )})}
         </ul>
       )}
     </GlassCard>

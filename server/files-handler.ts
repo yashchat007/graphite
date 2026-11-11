@@ -5,6 +5,9 @@ import type { SyncFile } from '../shared/sync-types'
 import { readAppSecret } from './auth'
 import { blobConfigured } from './blob'
 import { removeFileFromIndex, upsertFileInIndex } from './files-index'
+import { defaultExpiresAt } from './file-expiry'
+import { runFileExpiryCleanup } from './run-file-cleanup'
+import { assertCronAuthorized } from './cron-auth'
 import { redisConfigured } from './redis'
 function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
@@ -97,6 +100,8 @@ export async function handleFilesUpload(req: IncomingMessage, res: ServerRespons
           pathname: blob.pathname,
           uploadedAt: ts,
           updatedAt: ts,
+          expiresAt: defaultExpiresAt(ts),
+          keepPinned: false,
         }
         await upsertFileInIndex(file)
       },
@@ -185,5 +190,28 @@ export async function routeFilesApi(req: IncomingMessage, res: ServerResponse, u
     await handleFilesDelete(req, res)
     return
   }
+  if (urlPath === '/api/files/cleanup' && (req.method === 'GET' || req.method === 'POST')) {
+    await handleFilesCleanup(req, res)
+    return
+  }
   sendJson(res, 404, { error: 'Not found' })
+}
+
+export async function handleFilesCleanup(req: IncomingMessage, res: ServerResponse) {
+  const auth = assertCronAuthorized(req.headers)
+  if (!auth.ok) {
+    sendJson(res, auth.status, auth.body)
+    return
+  }
+  if (!redisConfigured()) {
+    sendJson(res, 503, { error: 'Redis not configured' })
+    return
+  }
+  try {
+    const { removed } = await runFileExpiryCleanup()
+    sendJson(res, 200, { ok: true, removed })
+  } catch (err) {
+    console.error('cleanup error', err)
+    sendJson(res, 500, { error: 'Cleanup failed' })
+  }
 }

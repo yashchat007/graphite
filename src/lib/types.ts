@@ -48,6 +48,8 @@ export interface StoredFile {
   pathname: string
   uploadedAt: string
   updatedAt: string
+  expiresAt: string
+  keepPinned?: boolean
 }
 
 export interface UndoAction {

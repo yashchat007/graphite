@@ -1,5 +1,6 @@
 import { upload } from '@vercel/blob/client'
 import type { StoredFile } from './types'
+import { defaultExpiresAt } from './file-expiry'
 import { generateId } from './task-utils'
 import { nowIso } from './sync-document'
 
@@ -49,6 +50,8 @@ export async function uploadFile(
       pathname: blob.pathname,
       uploadedAt: ts,
       updatedAt: ts,
+      expiresAt: defaultExpiresAt(ts),
+      keepPinned: false,
     }
   } finally {
     if (interval) clearInterval(interval)

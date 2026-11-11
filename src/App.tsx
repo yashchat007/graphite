@@ -16,6 +16,7 @@ import { PomodoroCard } from './features/focus/PomodoroCard'
 import { TodayNote } from './features/tasks/TodayNote'
 import { MyFilesCard } from './features/tasks/MyFilesCard'
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts'
+import { defaultExpiresAt, normalizeStoredFile, pruneStoredFiles } from './lib/file-expiry'
 import { nowIso } from './lib/sync-document'
 import { createSeedTasks } from './lib/seed'
 import { AccessKeyGate } from './components/auth/AccessKeyGate'
@@ -43,7 +44,14 @@ export default function App() {
         })),
         todayNoteUpdatedAt: state.todayNoteUpdatedAt ?? ts,
         tombstones: state.tombstones ?? [],
-        files: state.files ?? [],
+        files: pruneStoredFiles(
+          (state.files ?? []).map((f) =>
+            normalizeStoredFile({
+              ...f,
+              expiresAt: f.expiresAt ?? defaultExpiresAt(f.uploadedAt ?? ts),
+            }),
+          ),
+        ),
       })
       const next = useGraphiteStore.getState()
       if (!next.seeded || next.tasks.length === 0) {

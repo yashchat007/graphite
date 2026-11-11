@@ -80,6 +80,7 @@ export interface GraphiteState {
 
   addFile: (file: StoredFile) => void
   removeFile: (id: string) => void
+  toggleFileKeep: (id: string) => void
 
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
@@ -352,6 +353,13 @@ export const useGraphiteStore = create<GraphiteState>()(
           ],
         }))
       },
+
+      toggleFileKeep: (id) =>
+        set((s) => ({
+          files: s.files.map((f) =>
+            f.id === id ? { ...f, keepPinned: !f.keepPinned, updatedAt: nowIso() } : f,
+          ),
+        })),
 
       pushUndo: (action) => {
         const id = generateId()

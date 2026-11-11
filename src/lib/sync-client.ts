@@ -2,6 +2,7 @@ import { mergeDocuments } from '../../shared/sync-merge'
 import type { SyncDocument } from '../../shared/sync-types'
 import { buildSyncDocument } from './sync-document'
 import { useGraphiteStore } from '../store/useGraphiteStore'
+import { pruneStoredFiles } from './file-expiry'
 import { syncToFile, syncToList, syncToTask } from './sync-document'
 
 const SYNC_URL = '/api/sync'
@@ -66,7 +67,7 @@ export function applySyncDocument(doc: SyncDocument) {
   useGraphiteStore.setState({
     tasks: merged.tasks.map(syncToTask),
     lists: merged.lists.map(syncToList),
-    files: merged.files.map(syncToFile),
+    files: pruneStoredFiles(merged.files.map(syncToFile)),
     todayNote: merged.todayNote,
     todayNoteUpdatedAt: merged.todayNoteUpdatedAt,
     tombstones: merged.tombstones,
