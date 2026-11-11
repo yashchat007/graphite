@@ -20,7 +20,7 @@ export function useKeyboardShortcuts() {
         store.setFocusMode(false)
         store.setCommandPaletteOpen(false)
         store.setShortcutsOpen(false)
-        store.setTaskModalOpen(false, null)
+        store.setTaskModalOpen(false)
         return
       }
 
@@ -31,7 +31,7 @@ export function useKeyboardShortcuts() {
         return
       }
       if (e.key === 'n' || e.key === 'N') {
-        store.setTaskModalOpen(true, null)
+        store.setTaskModalOpen(true)
         return
       }
       if (e.key === '/') {
@@ -41,10 +41,6 @@ export function useKeyboardShortcuts() {
       }
       if (e.key === 'f' || e.key === 'F') {
         store.setFocusMode(true, store.selectedTaskId)
-        return
-      }
-      if (e.key === 'e' || e.key === 'E') {
-        if (store.selectedTaskId) store.setTaskModalOpen(true, store.selectedTaskId)
         return
       }
       if (e.key === 'x' || e.key === 'X') {

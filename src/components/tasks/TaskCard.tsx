@@ -14,7 +14,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronDown, Copy, MoreHorizontal, Pencil, Star, Trash2 } from 'lucide-react'
+import { Check, ChevronDown, Copy, MoreHorizontal, Star, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useCompletedSectionTasks } from '../../hooks/useCompletedTasks'
 import { useVisibleTasks } from '../../hooks/useVisibleTasks'
@@ -104,7 +104,6 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
   const toggleStar = useGraphiteStore((s) => s.toggleStar)
   const duplicateTask = useGraphiteStore((s) => s.duplicateTask)
   const deleteTask = useGraphiteStore((s) => s.deleteTask)
-  const setTaskModalOpen = useGraphiteStore((s) => s.setTaskModalOpen)
   const updateTask = useGraphiteStore((s) => s.updateTask)
   const lists = useGraphiteStore((s) => s.lists)
 
@@ -243,9 +242,9 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
               minWidth={168}
             >
               {[
-                { icon: Pencil, label: 'Edit', action: () => setTaskModalOpen(true, task.id) },
                 { icon: Copy, label: 'Duplicate', action: () => duplicateTask(task.id) },
                 { icon: Copy, label: 'Move to Work', action: () => updateTask(task.id, { listId: 'work' }) },
+                { icon: Copy, label: 'Move to Personal', action: () => updateTask(task.id, { listId: 'personal' }) },
                 { icon: Trash2, label: 'Delete', action: () => deleteTask(task.id) },
               ].map((item) => (
                 <MenuItem

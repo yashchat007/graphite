@@ -7,7 +7,6 @@ const SHORTCUTS = [
   ['⌘K / Ctrl+K', 'Command palette'],
   ['J / K', 'Move selection'],
   ['X', 'Complete task'],
-  ['E', 'Edit task'],
   ['Del', 'Delete task'],
   ['F', 'Focus mode'],
   ['Esc', 'Exit focus / close overlays'],

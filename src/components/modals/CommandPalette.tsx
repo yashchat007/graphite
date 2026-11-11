@@ -38,7 +38,7 @@ export function CommandPalette() {
       setExpandedTaskId(item.id)
     }
     if (item.type === 'list') setActiveListId(item.id)
-    if (item.type === 'action' && item.id === 'new') setTaskModalOpen(true, null)
+    if (item.type === 'action' && item.id === 'new') setTaskModalOpen(true)
     if (item.type === 'action' && item.id === 'focus') setFocusMode(true)
     setOpen(false)
     setQuery('')

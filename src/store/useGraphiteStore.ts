@@ -36,7 +36,6 @@ export interface GraphiteState {
   commandPaletteOpen: boolean
   shortcutsOpen: boolean
   taskModalOpen: boolean
-  editingTaskId: string | null
   focusMode: boolean
   focusTaskId: string | null
   stopwatch: StopwatchState
@@ -52,7 +51,7 @@ export interface GraphiteState {
   toggleSidebar: () => void
   setCommandPaletteOpen: (v: boolean) => void
   setShortcutsOpen: (v: boolean) => void
-  setTaskModalOpen: (v: boolean, editingId?: string | null) => void
+  setTaskModalOpen: (v: boolean) => void
   setFocusMode: (on: boolean, taskId?: string | null) => void
   setQuickAddDraft: (d: string) => void
 
@@ -120,7 +119,6 @@ export const useGraphiteStore = create<GraphiteState>()(
       commandPaletteOpen: false,
       shortcutsOpen: false,
       taskModalOpen: false,
-      editingTaskId: null,
       focusMode: false,
       focusTaskId: null,
       stopwatch: { ...defaultStopwatch },
@@ -136,8 +134,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setCommandPaletteOpen: (v) => set({ commandPaletteOpen: v }),
       setShortcutsOpen: (v) => set({ shortcutsOpen: v }),
-      setTaskModalOpen: (v, editingId = null) =>
-        set({ taskModalOpen: v, editingTaskId: editingId }),
+      setTaskModalOpen: (v) => set({ taskModalOpen: v }),
       setFocusMode: (on, taskId = null) =>
         set({ focusMode: on, focusTaskId: on ? taskId ?? get().selectedTaskId : null }),
       setQuickAddDraft: (d) => set({ quickAddDraft: d }),
