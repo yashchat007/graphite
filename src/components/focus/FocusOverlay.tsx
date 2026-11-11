@@ -32,19 +32,19 @@ export function FocusOverlay() {
           >
             {task ? (
               <GlassCard className="w-full p-6 text-center">
-                <p className="text-xs uppercase tracking-wider text-[#5A5A60]">Focus</p>
-                <h2 className="mt-2 text-2xl font-semibold text-[#F2F2F3]">{task.title}</h2>
-                <p className="mt-3 text-sm text-[#8A8A8F]">{task.description}</p>
+                <p className="text-xs uppercase tracking-wider text-faint">Focus</p>
+                <h2 className="mt-2 text-2xl font-semibold text-heading">{task.title}</h2>
+                <p className="mt-3 text-sm text-muted">{task.description}</p>
               </GlassCard>
             ) : (
-              <GlassCard className="w-full p-6 text-center text-sm text-[#8A8A8F]">
+              <GlassCard className="w-full p-6 text-center text-sm text-muted">
                 Select a task and press F to focus.
               </GlassCard>
             )}
             <motion.div className="w-full max-w-sm">
               <PomodoroCard />
             </motion.div>
-            <p className="text-xs text-[#5A5A60]">Press Esc to exit</p>
+            <p className="text-xs text-faint">Press Esc to exit</p>
           </motion.div>
         </motion.div>
       )}

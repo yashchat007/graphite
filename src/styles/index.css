@@ -4,17 +4,52 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'Instrument Serif', Georgia, serif;
 
-  --color-bg: #0b0b0c;
-  --color-heading: #f2f2f3;
-  --color-body: #c7c7cc;
-  --color-muted: #8a8a8f;
-  --color-faint: #5a5a60;
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.08);
-  --color-glass-highlight: rgba(255, 255, 255, 0.12);
-  --color-silver-from: #e6e6e8;
-  --color-silver-to: #9a9aa0;
-  --color-amber: #d9a35b;
+  --color-bg: var(--aurora-bg);
+  --color-heading: var(--aurora-text);
+  --color-body: var(--aurora-text);
+  --color-muted: var(--aurora-text-muted);
+  --color-faint: var(--aurora-text-faint);
+  --color-lavender: var(--aurora-accent);
+  --color-lavender-light: #a8b8f0;
+  --color-lavender-soft: var(--aurora-surface-soft);
+  --color-sage: #6fa88a;
+  --color-peach: #f5c6dc;
+  --color-accent: var(--aurora-accent);
+}
+
+/* Aurora — single production theme */
+:root {
+  --aurora-bg: #e6defa;
+  --aurora-text: #2d2550;
+  --aurora-text-muted: color-mix(in srgb, #2d2550 78%, #6d5bd0);
+  --aurora-text-faint: color-mix(in srgb, #2d2550 55%, #a8b8f0);
+  --aurora-accent: #6d5bd0;
+  --aurora-surface-soft: rgba(255, 255, 255, 0.38);
+  --aurora-glass: rgba(255, 255, 255, 0.28);
+  --aurora-glass-menu: rgba(255, 255, 255, 0.54);
+  --aurora-glass-border: rgba(255, 255, 255, 0.55);
+  --aurora-glass-highlight: rgba(255, 255, 255, 0.88);
+  --aurora-glass-shadow: rgba(109, 91, 208, 0.16);
+  --aurora-glass-hover: rgba(255, 255, 255, 0.38);
+  --aurora-overlay: rgba(45, 37, 80, 0.32);
+  --aurora-input-bg: rgba(255, 255, 255, 0.34);
+  --aurora-input-border: rgba(255, 255, 255, 0.58);
+  --aurora-starred: #e8a0c0;
+  --aurora-complete: #6fa88a;
+  --aurora-timer-track: rgba(109, 91, 208, 0.18);
+  --aurora-timer-ring: #6d5bd0;
+  --aurora-cursor-glow: rgba(201, 184, 245, 0.32);
+  --aurora-priority-high: #6d5bd0;
+  --aurora-priority-medium: #a8b8f0;
+  --aurora-priority-low: #6fa88a;
+  --aurora-priority-none: #b5accf;
+  --aurora-mesh: radial-gradient(ellipse 88% 68% at 12% 16%, #c9b8f5 0%, transparent 58%),
+    radial-gradient(ellipse 78% 58% at 88% 20%, #a8b8f0 0%, transparent 54%),
+    radial-gradient(ellipse 82% 62% at 52% 90%, #f5c6dc 0%, transparent 56%),
+    linear-gradient(165deg, #e6defa 0%, #e9e2f8 100%);
+  --aurora-blob-1: rgba(201, 184, 245, 0.62);
+  --aurora-blob-2: rgba(168, 184, 240, 0.5);
+  --aurora-blob-3: rgba(245, 198, 220, 0.48);
 }
 
 * {
@@ -30,39 +65,78 @@ body,
 body {
   margin: 0;
   font-family: var(--font-sans);
-  color: var(--color-body);
-  background: var(--color-bg);
+  color: var(--aurora-text);
+  background: var(--aurora-bg);
   -webkit-font-smoothing: antialiased;
 }
 
+.mesh-backdrop {
+  background: var(--aurora-mesh);
+}
+
 .glass-panel {
-  background: var(--color-glass);
-  backdrop-filter: blur(24px) saturate(120%);
-  -webkit-backdrop-filter: blur(24px) saturate(120%);
-  border: 1px solid var(--color-glass-border);
+  background: var(--aurora-glass);
+  backdrop-filter: blur(24px) saturate(165%);
+  -webkit-backdrop-filter: blur(24px) saturate(165%);
+  border: 1px solid var(--aurora-glass-border);
   box-shadow:
-    inset 0 1px 0 0 var(--color-glass-highlight),
-    0 20px 60px rgba(0, 0, 0, 0.5);
-  border-radius: 24px;
+    inset 0 1px 0 0 var(--aurora-glass-highlight),
+    0 12px 36px var(--aurora-glass-shadow),
+    0 4px 14px rgba(109, 91, 208, 0.08);
+  border-radius: 20px;
 }
 
+.glass-menu {
+  background: var(--aurora-glass-menu);
+  backdrop-filter: blur(24px) saturate(175%);
+  -webkit-backdrop-filter: blur(24px) saturate(175%);
+  border: 1px solid var(--aurora-glass-border);
+  box-shadow:
+    inset 0 1px 0 0 var(--aurora-glass-highlight),
+    0 16px 44px var(--aurora-glass-shadow),
+    0 6px 18px rgba(109, 91, 208, 0.1);
+}
+
+.lavender-gradient,
 .silver-gradient {
-  background: linear-gradient(135deg, var(--color-silver-from), var(--color-silver-to));
+  background: linear-gradient(145deg, #7a68d8 0%, #6d5bd0 100%);
 }
 
+.lavender-text,
 .silver-text {
-  background: linear-gradient(135deg, var(--color-silver-from), var(--color-silver-to));
+  background: linear-gradient(145deg, #7a68d8, #6d5bd0);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
+@utility surface-soft {
+  background: var(--aurora-surface-soft);
+}
+
+@utility border-glass {
+  border-color: var(--aurora-glass-border);
+}
+
+@utility field-glass {
+  border: 1px solid var(--aurora-input-border);
+  background: var(--aurora-input-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+@utility modal-overlay {
+  background: var(--aurora-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .progress-shimmer {
   background-image: linear-gradient(
     110deg,
-    rgba(255, 255, 255, 0.15) 0%,
-    rgba(255, 255, 255, 0.35) 40%,
-    rgba(255, 255, 255, 0.15) 80%
+    rgba(109, 91, 208, 0.1) 0%,
+    rgba(168, 184, 240, 0.32) 40%,
+    rgba(109, 91, 208, 0.1) 80%
   );
   background-size: 200% 100%;
   animation: shimmer 2.5s linear infinite;
@@ -87,7 +161,7 @@ body {
 
 .focus-ring:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--color-bg), 0 0 0 4px var(--color-silver-to);
+  box-shadow: 0 0 0 2px var(--aurora-bg), 0 0 0 4px var(--aurora-accent);
 }
 
 ::-webkit-scrollbar {
@@ -96,6 +170,6 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(109, 91, 208, 0.28);
   border-radius: 99px;
 }

@@ -39,13 +39,13 @@ export function ShortcutsSheet() {
             animate={{ scale: 1 }}
             exit={{ scale: 0.96 }}
           >
-            <h2 className="mb-4 text-lg font-semibold text-[#F2F2F3]">Keyboard shortcuts</h2>
+            <h2 className="mb-4 text-lg font-semibold text-heading">Keyboard shortcuts</h2>
             <dl className="space-y-2">
               {SHORTCUTS.map(([key, desc]) => (
                 <div key={key} className="flex items-center justify-between gap-4 text-sm">
-                  <dt className="text-[#8A8A8F]">{desc}</dt>
+                  <dt className="text-muted">{desc}</dt>
                   <dd>
-                    <kbd className="rounded-lg border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-[#F2F2F3]">
+                    <kbd className="rounded-lg border border-lavender/20 bg-white/70 px-2 py-0.5 text-xs text-heading">
                       {key}
                     </kbd>
                   </dd>

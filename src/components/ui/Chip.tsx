@@ -8,9 +8,9 @@ interface ChipProps {
 
 export function Chip({ children, variant = 'muted', className = '' }: ChipProps) {
   const styles = {
-    silver: 'silver-gradient text-[#0B0B0C]',
-    muted: 'bg-white/8 text-[#C7C7CC] border border-white/10',
-    'priority-high': 'bg-white/12 text-[#F2F2F3] border border-white/15',
+    silver: 'lavender-gradient text-white',
+    muted: 'surface-soft text-body border border-glass',
+    'priority-high': 'bg-[color-mix(in_srgb,var(--aurora-accent)_14%,transparent)] text-heading border border-glass',
   }
   return (
     <span

@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware'
 import { STORAGE_KEY } from '../lib/constants'
 import { createSeedTasks, SEED_LISTS } from '../lib/seed'
 import { buildTaskFromQuickAdd } from '../lib/nlp-parser'
+import { normalizeTask } from '../lib/normalize-task'
 import { filterTasksForSmartList, generateId } from '../lib/task-utils'
 import type {
-  FilterStatus,
   PomodoroState,
   Priority,
   Task,
@@ -22,7 +22,6 @@ export interface GraphiteState {
   tasks: Task[]
   lists: TaskList[]
   activeListId: string
-  filterStatus: FilterStatus
   filterListId: string | 'all'
   filterPriority: Priority | 'all'
   expandedTaskId: string | null
@@ -44,7 +43,7 @@ export interface GraphiteState {
 
   setHydrated: (v: boolean) => void
   setActiveListId: (id: string) => void
-  setFilters: (f: Partial<Pick<GraphiteState, 'filterStatus' | 'filterListId' | 'filterPriority'>>) => void
+  setFilters: (f: Partial<Pick<GraphiteState, 'filterListId' | 'filterPriority'>>) => void
   setExpandedTaskId: (id: string | null) => void
   setSelectedTaskId: (id: string | null) => void
   setTodayNote: (note: string) => void
@@ -64,8 +63,6 @@ export interface GraphiteState {
   duplicateTask: (id: string) => void
   toggleStar: (id: string) => void
   reorderTasks: (orderedIds: string[]) => void
-  toggleSubtask: (taskId: string, subtaskId: string) => void
-
   createList: (name: string) => string
   renameList: (id: string, name: string) => void
   deleteList: (id: string) => void
@@ -93,10 +90,11 @@ const defaultPomodoro: PomodoroState = {
   running: false,
 }
 
-export function applyTaskFilters(tasks: Task[], state: Pick<GraphiteState, 'activeListId' | 'filterStatus' | 'filterListId' | 'filterPriority'>): Task[] {
+export function applyTaskFilters(
+  tasks: Task[],
+  state: Pick<GraphiteState, 'activeListId' | 'filterListId' | 'filterPriority'>,
+): Task[] {
   let list = filterTasksForSmartList(tasks, state.activeListId)
-  if (state.filterStatus === 'todo') list = list.filter((t) => !t.completed)
-  if (state.filterStatus === 'done') list = list.filter((t) => t.completed)
   if (state.filterListId !== 'all') list = list.filter((t) => t.listId === state.filterListId)
   if (state.filterPriority !== 'all') list = list.filter((t) => t.priority === state.filterPriority)
   return [...list].sort((a, b) => a.order - b.order)
@@ -110,7 +108,6 @@ export const useGraphiteStore = create<GraphiteState>()(
       tasks: [],
       lists: [...SEED_LISTS],
       activeListId: 'today',
-      filterStatus: 'all',
       filterListId: 'all',
       filterPriority: 'all',
       expandedTaskId: null,
@@ -147,20 +144,21 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       addTaskFromQuickAdd: (input) => {
         const parsed = buildTaskFromQuickAdd(input)
+        const active = get().activeListId
         const listId =
-          parsed.listId && get().lists.some((l) => l.id === parsed.listId)
-            ? parsed.listId
-            : get().activeListId === 'completed' || get().activeListId === 'starred'
-              ? 'work'
-              : get().activeListId === 'today' || get().activeListId === 'upcoming'
-                ? 'work'
-                : get().activeListId
+          active === 'completed' ||
+          active === 'starred' ||
+          active === 'today' ||
+          active === 'upcoming' ||
+          active === 'inbox'
+            ? 'work'
+            : active
         return get().addTask({
           title: parsed.title,
           dueDate: parsed.dueDate,
           dueTime: parsed.dueTime,
           priority: parsed.priority,
-          listId: listId === 'today' || listId === 'upcoming' || listId === 'starred' ? 'work' : listId,
+          listId,
         })
       },
 
@@ -177,8 +175,6 @@ export const useGraphiteStore = create<GraphiteState>()(
           endTime: partial.endTime,
           priority: partial.priority ?? 'none',
           listId: partial.listId ?? 'work',
-          tags: partial.tags ?? [],
-          subtasks: partial.subtasks ?? [],
           completed: false,
           starred: partial.starred ?? false,
           order,
@@ -255,7 +251,6 @@ export const useGraphiteStore = create<GraphiteState>()(
           completed: false,
           completedAt: undefined,
           order: get().tasks.length,
-          subtasks: src.subtasks.map((st) => ({ ...st, id: generateId() })),
           createdAt: ts,
           updatedAt: ts,
         }
@@ -279,21 +274,6 @@ export const useGraphiteStore = create<GraphiteState>()(
             ),
           }
         }),
-
-      toggleSubtask: (taskId, subtaskId) =>
-        set((s) => ({
-          tasks: s.tasks.map((t) =>
-            t.id === taskId
-              ? {
-                  ...t,
-                  updatedAt: nowIso(),
-                  subtasks: t.subtasks.map((st) =>
-                    st.id === subtaskId ? { ...st, completed: !st.completed } : st,
-                  ),
-                }
-              : t,
-          ),
-        })),
 
       createList: (name) => {
         const id = name.toLowerCase().replace(/\s+/g, '-')
@@ -406,7 +386,13 @@ export const useGraphiteStore = create<GraphiteState>()(
         sidebarCollapsed: s.sidebarCollapsed,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state && (!state.seeded || state.tasks.length === 0)) {
+        if (!state) return
+        if (state.tasks?.length) {
+          useGraphiteStore.setState({
+            tasks: state.tasks.map((t) => normalizeTask(t as Task & { tags?: unknown; subtasks?: unknown })),
+          })
+        }
+        if (!state.seeded || state.tasks.length === 0) {
           useGraphiteStore.setState({ tasks: createSeedTasks(), seeded: true })
         }
       },

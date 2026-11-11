@@ -15,7 +15,7 @@ export function UndoToast() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
-            className="pointer-events-auto glass-panel flex items-center gap-3 px-4 py-3 text-sm text-[#C7C7CC]"
+            className="pointer-events-auto glass-panel flex items-center gap-3 px-4 py-3 text-sm text-body"
           >
             <span>{item.label}</span>
             <Button

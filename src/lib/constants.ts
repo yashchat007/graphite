@@ -1,7 +1,4 @@
-/** When true, amber (#D9A35B) is used for Today dots and high-priority tags only. */
-export const USE_AMBER_ACCENT = false
-
-export const STORAGE_KEY = 'graphite-store-v1'
+export const STORAGE_KEY = 'graphite-store-v2'
 export const ACCESS_KEY_STORAGE = 'graphite-access-key'
 
 export const SMART_LIST_IDS = {

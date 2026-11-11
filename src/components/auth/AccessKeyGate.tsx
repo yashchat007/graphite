@@ -56,23 +56,23 @@ export function AccessKeyGate({ children }: { children: ReactNode }) {
           <GlassCard className="p-8">
             <div className="mb-6 flex items-center gap-3">
               <motion.div
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5"
+                className="flex h-11 w-11 items-center justify-center rounded-xl border border-lavender/20 bg-white/70"
                 aria-hidden
               >
-                <Triangle className="h-4 w-4 text-[#E6E6E8]" strokeWidth={1.5} />
+                <Triangle className="h-4 w-4 text-lavender-light" strokeWidth={1.5} />
               </motion.div>
               <motion.div>
-                <h1 className="text-xl font-semibold text-[#F2F2F3]">Graphite</h1>
-                <p className="text-sm text-[#8A8A8F]">Enter access key</p>
+                <h1 className="text-xl font-semibold text-heading">Graphite</h1>
+                <p className="text-sm text-muted">Enter access key</p>
               </motion.div>
             </div>
 
-            <p className="mb-4 text-sm text-[#8A8A8F]">
+            <p className="mb-4 text-sm text-muted">
               Use the same secret on your laptop and phone so tasks stay in sync.
             </p>
 
-            <label className="mb-2 flex items-center gap-2 text-xs font-medium text-[#C7C7CC]" htmlFor="access-key">
-              <KeyRound className="h-3.5 w-3.5 text-[#8A8A8F]" />
+            <label className="mb-2 flex items-center gap-2 text-xs font-medium text-body" htmlFor="access-key">
+              <KeyRound className="h-3.5 w-3.5 text-muted" />
               Access key
             </label>
             <input
@@ -82,14 +82,14 @@ export function AccessKeyGate({ children }: { children: ReactNode }) {
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && void submit()}
-              className="focus-ring mb-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#F2F2F3] outline-none placeholder:text-[#5A5A60]"
+              className="focus-ring mb-2 w-full rounded-2xl border border-lavender/20 bg-white/70 px-4 py-3 text-sm text-heading outline-none placeholder:text-faint"
               placeholder="Your access key"
             />
             {error && (
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="mb-3 text-sm text-[#C7C7CC]"
+                className="mb-3 text-sm text-body"
                 role="alert"
               >
                 {error}

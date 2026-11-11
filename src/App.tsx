@@ -65,7 +65,7 @@ export default function App() {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0B0B0C] text-sm text-[#8A8A8F]">
+      <div className="flex min-h-screen items-center justify-center bg-bg text-sm text-muted">
         Loading Graphite…
       </div>
     )
@@ -80,7 +80,7 @@ export default function App() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.45, ease: 'easeOut' }}
       >
-        <motion.div className="glass-panel flex min-h-[calc(100vh-1.5rem)] flex-col overflow-hidden lg:min-h-[calc(100vh-3rem)] lg:flex-row">
+        <motion.div className="glass-panel flex min-h-[calc(100vh-1.5rem)] flex-col overflow-visible lg:min-h-[calc(100vh-3rem)] lg:flex-row">
           <Sidebar />
           <div className="flex min-w-0 flex-1 flex-col lg:flex-row">
             <div className="flex min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 pb-24 lg:p-6 lg:pb-6">
@@ -90,7 +90,7 @@ export default function App() {
               <QuickAdd />
               <TaskList />
             </div>
-            <aside className="flex w-full shrink-0 flex-col gap-4 border-t border-white/5 p-4 lg:w-[300px] lg:border-l lg:border-t-0 lg:overflow-y-auto">
+            <aside className="flex w-full shrink-0 flex-col gap-4 border-t border-lavender/15 p-4 lg:w-[300px] lg:border-l lg:border-t-0 lg:overflow-y-auto">
               <TodayNote />
               <MyFilesCard />
             </aside>

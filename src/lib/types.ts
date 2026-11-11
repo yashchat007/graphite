@@ -1,11 +1,5 @@
 export type Priority = 'high' | 'medium' | 'low' | 'none'
 
-export interface Subtask {
-  id: string
-  title: string
-  completed: boolean
-}
-
 export interface Task {
   id: string
   title: string
@@ -15,8 +9,6 @@ export interface Task {
   endTime?: string
   priority: Priority
   listId: string
-  tags: string[]
-  subtasks: Subtask[]
   completed: boolean
   starred: boolean
   order: number
@@ -36,8 +28,6 @@ export interface Tombstone {
   kind: 'task' | 'list' | 'file'
   deletedAt: string
 }
-
-export type FilterStatus = 'all' | 'todo' | 'done'
 
 export interface StoredFile {
   id: string

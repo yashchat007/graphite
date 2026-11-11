@@ -23,9 +23,7 @@ export function PomodoroCard() {
   const total = pomodoro.phase === 'work' ? pomodoro.workSeconds : pomodoro.breakSeconds
   const progress = 1 - pomodoro.remaining / total
   const circumference = 2 * Math.PI * 54
-  const focusTask = tasks.find(
-    (t) => t.id === (pomodoro.focusTaskId ?? selectedTaskId),
-  )
+  const focusTask = tasks.find((t) => t.id === (pomodoro.focusTaskId ?? selectedTaskId))
 
   useEffect(() => {
     if (!pomodoro.running) return
@@ -36,8 +34,8 @@ export function PomodoroCard() {
   return (
     <GlassCard className="p-5">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-[#F2F2F3]">Focus</h2>
-        <span className="text-[11px] uppercase tracking-wide text-[#5A5A60]">
+        <h2 className="text-sm font-semibold text-heading">Focus</h2>
+        <span className="text-[11px] uppercase tracking-wide text-faint">
           {pomodoro.phase === 'work' ? '25 / 5' : 'Break'}
         </span>
       </div>
@@ -45,13 +43,20 @@ export function PomodoroCard() {
       <div className="flex flex-col items-center gap-4">
         <div className="relative h-36 w-36">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden>
-            <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" />
+            <circle
+              cx="60"
+              cy="60"
+              r="54"
+              fill="none"
+              stroke="var(--aurora-timer-track)"
+              strokeWidth="8"
+            />
             <motion.circle
               cx="60"
               cy="60"
               r="54"
               fill="none"
-              stroke="url(#silverRing)"
+              stroke="url(#focusRingGradient)"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -59,9 +64,9 @@ export function PomodoroCard() {
               transition={{ duration: 0.4 }}
             />
             <defs>
-              <linearGradient id="silverRing" x1="0" y1="0" x2="1" y2="1">
-                <stop stopColor="#E6E6E8" />
-                <stop offset="1" stopColor="#9A9AA0" />
+              <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop stopColor="var(--aurora-timer-ring)" />
+                <stop offset="1" stopColor="var(--aurora-accent)" />
               </linearGradient>
             </defs>
           </svg>
@@ -71,13 +76,13 @@ export function PomodoroCard() {
             animate={{ opacity: 1 }}
             className="absolute inset-0 flex flex-col items-center justify-center"
           >
-            <span className="text-3xl font-semibold tabular-nums text-[#F2F2F3]">
+            <span className="text-3xl font-semibold tabular-nums text-heading">
               {formatTime(pomodoro.remaining)}
             </span>
           </motion.div>
         </div>
 
-        <p className="line-clamp-2 text-center text-xs text-[#8A8A8F]">
+        <p className="line-clamp-2 text-center text-xs text-muted">
           {focusTask ? focusTask.title : 'Select a task to focus'}
         </p>
 
