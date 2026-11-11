@@ -1,5 +1,5 @@
 import type { IncomingHttpHeaders } from 'http'
-import { redisConfigured } from './redis'
+import { redisConfigured } from './redis.js'
 
 export function readAppSecret(headers: IncomingHttpHeaders): string | undefined {
   const raw = headers['x-app-secret']

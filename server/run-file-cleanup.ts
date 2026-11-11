@@ -1,7 +1,7 @@
-import { documentFromClient } from '../shared/sync-merge'
-import type { SyncDocument } from '../shared/sync-types'
-import { pruneExpiredFiles } from './file-expiry'
-import { loadRemoteState, redisConfigured, saveRemoteState } from './redis'
+import { documentFromClient } from '../shared/sync-merge.js'
+import type { SyncDocument } from '../shared/sync-types.js'
+import { pruneExpiredFiles } from './file-expiry.js'
+import { loadRemoteState, redisConfigured, saveRemoteState } from './redis.js'
 
 export async function runFileExpiryCleanup(): Promise<{ document: SyncDocument; removed: number }> {
   const stored = documentFromClient((await loadRemoteState()) as Partial<SyncDocument> | null)

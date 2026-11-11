@@ -1,6 +1,6 @@
-import { documentFromClient, mergeDocuments } from '../shared/sync-merge'
-import type { SyncFile } from '../shared/sync-types'
-import { loadRemoteState, redisConfigured, saveRemoteState } from './redis'
+import { documentFromClient, mergeDocuments } from '../shared/sync-merge.js'
+import type { SyncFile } from '../shared/sync-types.js'
+import { loadRemoteState, redisConfigured, saveRemoteState } from './redis.js'
 
 export async function upsertFileInIndex(file: SyncFile): Promise<void> {
   if (!redisConfigured()) return

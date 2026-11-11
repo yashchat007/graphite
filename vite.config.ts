@@ -3,8 +3,8 @@ import react from '@vitejs/plugin-react'
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { Plugin } from 'vite'
 import { defineConfig, loadEnv } from 'vite'
-import { routeFilesApi } from './server/files-handler.ts'
-import { handleSyncApi } from './server/handler.ts'
+import { routeFilesApi } from './server/files-handler.js'
+import { handleSyncApi } from './server/handler.js'
 
 function graphiteApiDevPlugin(): Plugin {
   return {

@@ -1,14 +1,14 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 import { del, head } from '@vercel/blob'
 import { handleUpload, type HandleUploadBody } from '@vercel/blob/client'
-import type { SyncFile } from '../shared/sync-types'
-import { readAppSecret } from './auth'
-import { blobConfigured } from './blob'
-import { removeFileFromIndex, upsertFileInIndex } from './files-index'
-import { defaultExpiresAt } from './file-expiry'
-import { runFileExpiryCleanup } from './run-file-cleanup'
-import { assertCronAuthorized } from './cron-auth'
-import { redisConfigured } from './redis'
+import type { SyncFile } from '../shared/sync-types.js'
+import { readAppSecret } from './auth.js'
+import { blobConfigured } from './blob.js'
+import { removeFileFromIndex, upsertFileInIndex } from './files-index.js'
+import { defaultExpiresAt } from './file-expiry.js'
+import { runFileExpiryCleanup } from './run-file-cleanup.js'
+import { assertCronAuthorized } from './cron-auth.js'
+import { redisConfigured } from './redis.js'
 function generateId(): string {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
 }
