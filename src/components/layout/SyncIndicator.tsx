@@ -4,8 +4,8 @@ import { useSyncStore } from '../../store/useSyncStore'
 const TOOLTIP = {
   synced: 'Synced',
   syncing: 'Syncing',
-  offline: 'Offline',
-  'local-only': 'Offline',
+  offline: 'Sync pending',
+  'local-only': 'Sync pending',
 } as const
 
 const DOT = {

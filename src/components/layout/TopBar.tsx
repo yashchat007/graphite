@@ -1,33 +1,25 @@
-import { format, parseISO } from 'date-fns'
-import { ChevronRight, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { SyncIndicator } from './SyncIndicator'
 
 export function TopBar() {
-  const pickerDate = useGraphiteStore((s) => s.pickerDate)
-  const setPickerDate = useGraphiteStore((s) => s.setPickerDate)
   const setCommandPaletteOpen = useGraphiteStore((s) => s.setCommandPaletteOpen)
+  const activeListId = useGraphiteStore((s) => s.activeListId)
 
-  const displayDate = format(parseISO(pickerDate), 'EEEE, MMM d')
+  const viewLabel =
+    activeListId === 'today'
+      ? 'Today'
+      : activeListId === 'upcoming'
+        ? 'Upcoming'
+        : activeListId === 'starred'
+          ? 'Starred'
+          : activeListId === 'completed'
+            ? 'Completed'
+            : 'Dashboard'
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 pb-2">
-      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-[#8A8A8F]">
-        <span>Home</span>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <span className="text-[#C7C7CC]">Dashboard</span>
-        <ChevronRight className="h-3.5 w-3.5" />
-        <label className="flex items-center gap-2">
-          <span className="sr-only">Selected date</span>
-          <input
-            type="date"
-            value={pickerDate}
-            onChange={(e) => setPickerDate(e.target.value)}
-            className="focus-ring cursor-pointer rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-[#C7C7CC]"
-          />
-        </label>
-        <span className="hidden text-[#5A5A60] sm:inline">{displayDate}</span>
-      </nav>
+      <h2 className="text-sm font-medium text-[#C7C7CC]">{viewLabel}</h2>
 
       <div className="flex items-center gap-3">
         <SyncIndicator />

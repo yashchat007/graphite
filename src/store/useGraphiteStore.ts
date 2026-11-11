@@ -1,13 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { format } from 'date-fns'
 import { STORAGE_KEY } from '../lib/constants'
 import { createSeedTasks, SEED_LISTS } from '../lib/seed'
 import { buildTaskFromQuickAdd } from '../lib/nlp-parser'
 import { filterTasksForSmartList, generateId } from '../lib/task-utils'
 import type {
   FilterStatus,
-  NavView,
   PomodoroState,
   Priority,
   Task,
@@ -23,7 +21,6 @@ export interface GraphiteState {
   seeded: boolean
   tasks: Task[]
   lists: TaskList[]
-  activeNav: NavView
   activeListId: string
   filterStatus: FilterStatus
   filterListId: string | 'all'
@@ -37,18 +34,15 @@ export interface GraphiteState {
   sidebarCollapsed: boolean
   commandPaletteOpen: boolean
   shortcutsOpen: boolean
-  searchOpen: boolean
   taskModalOpen: boolean
   editingTaskId: string | null
   focusMode: boolean
   focusTaskId: string | null
   pomodoro: PomodoroState
   undoQueue: UndoAction[]
-  pickerDate: string
   quickAddDraft: string
 
   setHydrated: (v: boolean) => void
-  setActiveNav: (v: NavView) => void
   setActiveListId: (id: string) => void
   setFilters: (f: Partial<Pick<GraphiteState, 'filterStatus' | 'filterListId' | 'filterPriority'>>) => void
   setExpandedTaskId: (id: string | null) => void
@@ -57,10 +51,8 @@ export interface GraphiteState {
   toggleSidebar: () => void
   setCommandPaletteOpen: (v: boolean) => void
   setShortcutsOpen: (v: boolean) => void
-  setSearchOpen: (v: boolean) => void
   setTaskModalOpen: (v: boolean, editingId?: string | null) => void
   setFocusMode: (on: boolean, taskId?: string | null) => void
-  setPickerDate: (d: string) => void
   setQuickAddDraft: (d: string) => void
 
   addTaskFromQuickAdd: (input: string) => string
@@ -117,9 +109,8 @@ export const useGraphiteStore = create<GraphiteState>()(
       seeded: false,
       tasks: [],
       lists: [...SEED_LISTS],
-      activeNav: 'dashboard',
       activeListId: 'today',
-      filterStatus: 'todo',
+      filterStatus: 'all',
       filterListId: 'all',
       filterPriority: 'all',
       expandedTaskId: null,
@@ -131,18 +122,15 @@ export const useGraphiteStore = create<GraphiteState>()(
       sidebarCollapsed: false,
       commandPaletteOpen: false,
       shortcutsOpen: false,
-      searchOpen: false,
       taskModalOpen: false,
       editingTaskId: null,
       focusMode: false,
       focusTaskId: null,
       pomodoro: { ...defaultPomodoro },
       undoQueue: [],
-      pickerDate: format(new Date(), 'yyyy-MM-dd'),
       quickAddDraft: '',
 
       setHydrated: (v) => set({ hydrated: v }),
-      setActiveNav: (v) => set({ activeNav: v }),
       setActiveListId: (id) => set({ activeListId: id }),
       setFilters: (f) => set(f),
       setExpandedTaskId: (id) => set({ expandedTaskId: id }),
@@ -151,12 +139,10 @@ export const useGraphiteStore = create<GraphiteState>()(
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setCommandPaletteOpen: (v) => set({ commandPaletteOpen: v }),
       setShortcutsOpen: (v) => set({ shortcutsOpen: v }),
-      setSearchOpen: (v) => set({ searchOpen: v }),
       setTaskModalOpen: (v, editingId = null) =>
         set({ taskModalOpen: v, editingTaskId: editingId }),
       setFocusMode: (on, taskId = null) =>
         set({ focusMode: on, focusTaskId: on ? taskId ?? get().selectedTaskId : null }),
-      setPickerDate: (d) => set({ pickerDate: d }),
       setQuickAddDraft: (d) => set({ quickAddDraft: d }),
 
       addTaskFromQuickAdd: (input) => {
