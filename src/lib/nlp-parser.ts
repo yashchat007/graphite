@@ -1,4 +1,5 @@
-import { addDays, nextMonday, nextTuesday, nextWednesday, nextThursday, nextFriday, nextSaturday, nextSunday, startOfWeek, addWeeks, format, parse } from 'date-fns'
+import { nextMonday, nextTuesday, nextWednesday, nextThursday, nextFriday, nextSaturday, nextSunday, startOfWeek, addWeeks, format, parse } from 'date-fns'
+import { istTodayYmd, istTomorrowYmd } from './ist-time'
 
 export interface ParsedToken {
   type: 'date' | 'time' | 'priority' | 'text'
@@ -57,9 +58,9 @@ export function tokenizeQuickAdd(input: string): ParsedToken[] {
     const lower = part.toLowerCase()
 
     if (lower === 'today') {
-      tokens.push({ type: 'date', raw: part, value: format(new Date(), 'yyyy-MM-dd'), start, end })
+      tokens.push({ type: 'date', raw: part, value: istTodayYmd(), start, end })
     } else if (lower === 'tomorrow') {
-      tokens.push({ type: 'date', raw: part, value: format(addDays(new Date(), 1), 'yyyy-MM-dd'), start, end })
+      tokens.push({ type: 'date', raw: part, value: istTomorrowYmd(), start, end })
     } else if (lower === 'next' && input.slice(end).match(/^\s+week/i)) {
       const nextWeekStart = startOfWeek(addWeeks(new Date(), 1), { weekStartsOn: 1 })
       tokens.push({ type: 'date', raw: 'next week', value: format(nextWeekStart, 'yyyy-MM-dd'), start, end: end + 5 })

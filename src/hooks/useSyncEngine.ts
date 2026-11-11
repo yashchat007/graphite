@@ -103,10 +103,11 @@ export async function pullRemoteState() {
 
 export function useSyncEngine() {
   const unlocked = useSyncStore((s) => s.unlocked)
+  const hydrated = useGraphiteStore((s) => s.hydrated)
   const subscribed = useRef(false)
 
   useEffect(() => {
-    if (!unlocked) return
+    if (!unlocked || !hydrated) return
 
     void pullRemoteState()
 
@@ -131,10 +132,10 @@ export function useSyncEngine() {
       window.removeEventListener('offline', onOffline)
       clearInterval(interval)
     }
-  }, [unlocked])
+  }, [unlocked, hydrated])
 
   useEffect(() => {
-    if (!unlocked || subscribed.current) return
+    if (!unlocked || !hydrated || subscribed.current) return
     subscribed.current = true
     return useGraphiteStore.subscribe((state, prev) => {
       const syncFieldsChanged =
@@ -145,5 +146,5 @@ export function useSyncEngine() {
         state.tombstones !== prev.tombstones
       if (syncFieldsChanged) scheduleSyncPush()
     })
-  }, [unlocked])
+  }, [unlocked, hydrated])
 }

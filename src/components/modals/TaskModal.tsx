@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
 import type { Priority } from '../../lib/types'
+import { istTodayYmd } from '../../lib/ist-time'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { Button } from '../ui/Button'
 
@@ -18,6 +19,7 @@ export function TaskModal() {
   const updateTask = useGraphiteStore((s) => s.updateTask)
 
   const existing = editingId ? tasks.find((t) => t.id === editingId) : undefined
+  const activeListId = useGraphiteStore((s) => s.activeListId)
 
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -36,14 +38,16 @@ export function TaskModal() {
       setPriority(existing.priority)
       setListId(existing.listId)
     } else {
+      const defaultDue =
+        activeListId === 'today' || activeListId === 'upcoming' ? istTodayYmd() : ''
       setTitle('')
       setDescription('')
-      setDueDate('')
+      setDueDate(defaultDue)
       setDueTime('')
       setPriority('none')
       setListId('work')
     }
-  }, [open, existing])
+  }, [open, existing, activeListId])
 
   const save = () => {
     if (!title.trim()) return
