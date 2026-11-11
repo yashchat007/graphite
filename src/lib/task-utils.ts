@@ -1,10 +1,34 @@
-import { addDays, format, parseISO } from 'date-fns'
-import { istStartOfToday, istTodayYmd, istTomorrowYmd } from './ist-time'
+import { format, parseISO } from 'date-fns'
+import { istTodayYmd, istTomorrowYmd } from './ist-time'
 import type { Task } from './types'
 
 export function isDueToday(task: Task): boolean {
   if (!task.dueDate) return false
   return task.dueDate === istTodayYmd()
+}
+
+/** Incomplete tasks with a due date strictly after IST today (yyyy-MM-dd compare). */
+export function isDueAfterToday(task: Task): boolean {
+  if (!task.dueDate) return false
+  return task.dueDate > istTodayYmd()
+}
+
+/** Sidebar smart list where this task appears among open tasks. */
+export function resolveActiveListForTask(task: Task): string {
+  if (task.completed) return 'completed'
+  if (task.starred) return 'starred'
+  if (isDueAfterToday(task)) return 'upcoming'
+  return 'today'
+}
+
+function matchesTodayOpen(task: Task): boolean {
+  if (task.completed) return false
+  if (!task.dueDate) return true
+  return task.dueDate <= istTodayYmd()
+}
+
+function matchesUpcomingOpen(task: Task): boolean {
+  return !task.completed && isDueAfterToday(task)
 }
 
 export function isDueTomorrow(task: Task): boolean {
@@ -20,20 +44,13 @@ export function dueLabel(task: Task): string {
 }
 
 export function filterTasksForSmartList(tasks: Task[], listId: string): Task[] {
-  const now = istStartOfToday()
-  const in7 = addDays(now, 7)
-
   switch (listId) {
     case 'inbox':
       return tasks.filter((t) => !t.completed && t.listId === 'inbox')
     case 'today':
-      return tasks.filter((t) => !t.completed && t.dueDate && t.dueDate === istTodayYmd())
+      return tasks.filter(matchesTodayOpen)
     case 'upcoming':
-      return tasks.filter((t) => {
-        if (t.completed || !t.dueDate) return false
-        const d = parseISO(t.dueDate)
-        return d >= now && d <= in7
-      })
+      return tasks.filter(matchesUpcomingOpen)
     case 'starred':
       return tasks.filter((t) => !t.completed && t.starred)
     case 'completed':
@@ -44,20 +61,15 @@ export function filterTasksForSmartList(tasks: Task[], listId: string): Task[] {
 }
 
 export function filterCompletedForSmartList(tasks: Task[], listId: string): Task[] {
-  const now = istStartOfToday()
-  const in7 = addDays(now, 7)
-
   if (listId === 'completed') return []
 
   switch (listId) {
     case 'today':
-      return tasks.filter((t) => t.completed && t.dueDate && t.dueDate === istTodayYmd())
+      return tasks.filter(
+        (t) => t.completed && (!t.dueDate || t.dueDate <= istTodayYmd()),
+      )
     case 'upcoming':
-      return tasks.filter((t) => {
-        if (!t.completed || !t.dueDate) return false
-        const d = parseISO(t.dueDate)
-        return d >= now && d <= in7
-      })
+      return tasks.filter((t) => t.completed && isDueAfterToday(t))
     case 'starred':
       return tasks.filter((t) => t.completed && t.starred)
     case 'inbox':

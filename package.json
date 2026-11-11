@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "test": "node scripts/test-completed-section.mjs && node scripts/test-ist-today.mjs && node scripts/test-stopwatch.mjs",
+    "test": "node scripts/test-completed-section.mjs && node scripts/test-ist-today.mjs && node scripts/test-stopwatch.mjs && node scripts/test-upcoming.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

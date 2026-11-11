@@ -15,7 +15,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, ChevronDown, Copy, MoreHorizontal, Star, Trash2 } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useCompletedSectionTasks } from '../../hooks/useCompletedTasks'
 import { useVisibleTasks } from '../../hooks/useVisibleTasks'
 import { parseDisplayTimeRange } from '../../lib/nlp-parser'
@@ -112,6 +112,13 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [completing, setCompleting] = useState(false)
   const menuAnchor = useRef<HTMLButtonElement>(null)
+  const scrollRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (selected && scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [selected])
 
   const listName = lists.find((l) => l.id === task.listId)?.name ?? task.listId
   const isDone = task.completed
@@ -278,9 +285,14 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
     )
   }
 
+  const setRefs = (node: HTMLDivElement | null) => {
+    scrollRef.current = node
+    setNodeRef(node)
+  }
+
   return (
     <motion.div
-      ref={setNodeRef}
+      ref={setRefs}
       layout
       style={style}
       initial={{ opacity: 0, y: 12, scale: 0.98 }}
