@@ -1,7 +1,7 @@
 import { addDays, nextMonday, nextTuesday, nextWednesday, nextThursday, nextFriday, nextSaturday, nextSunday, startOfWeek, addWeeks, format, parse } from 'date-fns'
 
 export interface ParsedToken {
-  type: 'date' | 'time' | 'priority' | 'list' | 'text'
+  type: 'date' | 'time' | 'priority' | 'text'
   raw: string
   value?: string
   start: number
@@ -72,8 +72,6 @@ export function tokenizeQuickAdd(input: string): ParsedToken[] {
       } else {
         tokens.push({ type: 'text', raw: part, start, end })
       }
-    } else if (part.startsWith('#')) {
-      tokens.push({ type: 'list', raw: part, value: part.slice(1).toLowerCase(), start, end })
     } else {
       const time = parseTimeToken(part)
       if (time) {
@@ -92,21 +90,18 @@ export function buildTaskFromQuickAdd(input: string): {
   dueDate?: string
   dueTime?: string
   priority: 'high' | 'medium' | 'low' | 'none'
-  listId?: string
 } {
   const tokens = tokenizeQuickAdd(input)
   const titleParts: string[] = []
   let dueDate: string | undefined
   let dueTime: string | undefined
   let priority: 'high' | 'medium' | 'low' | 'none' = 'none'
-  let listId: string | undefined
 
   for (const t of tokens) {
     if (t.type === 'text') titleParts.push(t.raw)
     if (t.type === 'date') dueDate = t.value
     if (t.type === 'time') dueTime = t.value
     if (t.type === 'priority' && t.value) priority = t.value as typeof priority
-    if (t.type === 'list') listId = t.value
   }
 
   return {
@@ -114,7 +109,6 @@ export function buildTaskFromQuickAdd(input: string): {
     dueDate,
     dueTime,
     priority,
-    listId,
   }
 }
 

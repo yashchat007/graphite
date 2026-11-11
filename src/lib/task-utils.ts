@@ -1,12 +1,6 @@
 import { addDays, format, isSameDay, parseISO, startOfDay } from 'date-fns'
 import type { Task } from './types'
 
-export function subtaskProgress(task: Task): number {
-  if (task.subtasks.length === 0) return task.completed ? 100 : 0
-  const done = task.subtasks.filter((s) => s.completed).length
-  return Math.round((done / task.subtasks.length) * 100)
-}
-
 export function isDueToday(task: Task): boolean {
   if (!task.dueDate) return false
   return isSameDay(parseISO(task.dueDate), new Date())

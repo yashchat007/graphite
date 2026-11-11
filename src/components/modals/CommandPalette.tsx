@@ -68,29 +68,29 @@ export function CommandPalette() {
             exit={{ scale: 0.96, y: -8 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
           >
-            <div className="flex items-center gap-2 border-b border-white/8 px-4 py-3">
-              <Search className="h-4 w-4 text-[#8A8A8F]" />
+            <div className="flex items-center gap-2 border-b border-lavender/15 px-4 py-3">
+              <Search className="h-4 w-4 text-muted" />
               <input
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search tasks, lists, actions…"
-                className="flex-1 bg-transparent text-sm text-[#F2F2F3] outline-none placeholder:text-[#5A5A60]"
+                className="flex-1 bg-transparent text-sm text-heading outline-none placeholder:text-faint"
               />
             </div>
             <ul className="max-h-80 overflow-y-auto p-2">
               {results.length === 0 ? (
-                <li className="px-3 py-6 text-center text-sm text-[#8A8A8F]">No results</li>
+                <li className="px-3 py-6 text-center text-sm text-muted">No results</li>
               ) : (
                 results.map((item) => (
                   <li key={`${item.type}-${item.id}`}>
                     <button
                       type="button"
-                      className="focus-ring flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm text-[#C7C7CC] hover:bg-white/8"
+                      className="focus-ring flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm text-body hover:bg-lavender-soft"
                       onClick={() => run(item)}
                     >
                       <span>{item.label}</span>
-                      <span className="text-[10px] uppercase tracking-wide text-[#5A5A60]">{item.type}</span>
+                      <span className="text-[10px] uppercase tracking-wide text-faint">{item.type}</span>
                     </button>
                   </li>
                 ))

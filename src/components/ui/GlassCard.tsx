@@ -20,10 +20,10 @@ export function GlassCard({
 
   return (
     <motion.div
-      className={`glass-panel relative overflow-hidden ${className}`}
+      className={`glass-panel relative overflow-visible ${className}`}
       whileHover={
         hoverLift && !reduced
-          ? { y: -2, backgroundColor: 'rgba(255,255,255,0.07)' }
+          ? { y: -2, boxShadow: '0 12px 40px rgba(139, 127, 214, 0.12)' }
           : undefined
       }
       transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -51,9 +51,9 @@ export function GlassCard({
       {cursorGlow && (
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           style={{
-            background: `radial-gradient(600px circle at var(--mx) var(--my), rgba(255,255,255,0.08), transparent 40%)`,
+            background: `radial-gradient(600px circle at var(--mx) var(--my), rgba(184, 174, 234, 0.18), transparent 40%)`,
           }}
         />
       )}

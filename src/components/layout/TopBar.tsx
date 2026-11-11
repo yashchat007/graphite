@@ -19,7 +19,7 @@ export function TopBar() {
 
   return (
     <header className="flex flex-wrap items-center justify-between gap-4 pb-2">
-      <h2 className="text-sm font-medium text-[#C7C7CC]">{viewLabel}</h2>
+      <h2 className="text-sm font-medium text-body">{viewLabel}</h2>
 
       <div className="flex items-center gap-3">
         <SyncIndicator />
@@ -27,11 +27,11 @@ export function TopBar() {
           type="button"
           aria-label="Open command palette"
           onClick={() => setCommandPaletteOpen(true)}
-          className="focus-ring flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-[#8A8A8F] hover:border-white/20"
+          className="focus-ring flex items-center gap-2 rounded-full border border-lavender/20 bg-white/70 px-3 py-1.5 text-xs text-muted hover:border-lavender/30"
         >
           <Search className="h-3.5 w-3.5" />
           <span className="hidden sm:inline">Search</span>
-          <kbd className="hidden rounded border border-white/15 px-1.5 py-0.5 text-[10px] sm:inline">
+          <kbd className="hidden rounded border border-lavender/20 px-1.5 py-0.5 text-[10px] sm:inline">
             ⌘K
           </kbd>
         </button>

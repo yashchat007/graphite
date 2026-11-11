@@ -1,13 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import type { Priority, Subtask } from '../../lib/types'
-import { generateId } from '../../lib/task-utils'
+import type { Priority } from '../../lib/types'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { Button } from '../ui/Button'
 
 const fieldClass =
-  'focus-ring w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-[#C7C7CC] outline-none'
+  'focus-ring w-full rounded-xl border border-lavender/20 bg-white/70 px-3 py-2 text-sm text-body outline-none'
 
 export function TaskModal() {
   const open = useGraphiteStore((s) => s.taskModalOpen)
@@ -26,9 +25,6 @@ export function TaskModal() {
   const [dueTime, setDueTime] = useState('')
   const [priority, setPriority] = useState<Priority>('none')
   const [listId, setListId] = useState('work')
-  const [tags, setTags] = useState('')
-  const [subtasks, setSubtasks] = useState<Subtask[]>([])
-  const [newSubtask, setNewSubtask] = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -39,8 +35,6 @@ export function TaskModal() {
       setDueTime(existing.dueTime ?? '')
       setPriority(existing.priority)
       setListId(existing.listId)
-      setTags(existing.tags.join(', '))
-      setSubtasks(existing.subtasks)
     } else {
       setTitle('')
       setDescription('')
@@ -48,8 +42,6 @@ export function TaskModal() {
       setDueTime('')
       setPriority('none')
       setListId('work')
-      setTags('')
-      setSubtasks([])
     }
   }, [open, existing])
 
@@ -62,11 +54,6 @@ export function TaskModal() {
       dueTime: dueTime || undefined,
       priority,
       listId,
-      tags: tags
-        .split(',')
-        .map((t) => t.trim())
-        .filter(Boolean),
-      subtasks,
     }
     if (existing) updateTask(existing.id, payload)
     else addTask(payload)
@@ -85,7 +72,7 @@ export function TaskModal() {
           <button
             type="button"
             aria-label="Close modal"
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            className="absolute inset-0 bg-heading/25 backdrop-blur-md"
             onClick={() => setTaskModalOpen(false, null)}
           />
           <motion.div
@@ -99,14 +86,14 @@ export function TaskModal() {
             transition={{ type: 'spring', stiffness: 320, damping: 28 }}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 id="task-modal-title" className="text-lg font-semibold text-[#F2F2F3]">
+              <h2 id="task-modal-title" className="text-lg font-semibold text-heading">
                 {existing ? 'Edit task' : 'New task'}
               </h2>
               <button
                 type="button"
                 aria-label="Close"
                 onClick={() => setTaskModalOpen(false, null)}
-                className="focus-ring rounded-lg p-1 text-[#8A8A8F] hover:bg-white/5"
+                className="focus-ring rounded-lg p-1 text-muted hover:bg-lavender-soft"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -126,12 +113,6 @@ export function TaskModal() {
               listId={listId}
               setListId={setListId}
               lists={lists}
-              tags={tags}
-              setTags={setTags}
-              subtasks={subtasks}
-              setSubtasks={setSubtasks}
-              newSubtask={newSubtask}
-              setNewSubtask={setNewSubtask}
             />
 
             <div className="mt-6 flex justify-end gap-2">
@@ -151,7 +132,7 @@ export function TaskModal() {
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="block text-xs text-[#8A8A8F]">
+    <label className="block text-xs text-muted">
       {label}
       <motion.div className="mt-1">{children}</motion.div>
     </label>
@@ -172,12 +153,6 @@ function TaskFormFields(props: {
   listId: string
   setListId: (v: string) => void
   lists: { id: string; name: string }[]
-  tags: string
-  setTags: (v: string) => void
-  subtasks: Subtask[]
-  setSubtasks: (v: Subtask[]) => void
-  newSubtask: string
-  setNewSubtask: (v: string) => void
 }) {
   return (
     <motion.div className="space-y-4">
@@ -231,43 +206,6 @@ function TaskFormFields(props: {
             ))}
           </select>
         </Field>
-      </div>
-      <Field label="Tags (comma-separated)">
-        <input className={fieldClass} value={props.tags} onChange={(e) => props.setTags(e.target.value)} />
-      </Field>
-      <div>
-        <p className="text-xs text-[#8A8A8F]">Subtasks</p>
-        <ul className="mt-2 space-y-1">
-          {props.subtasks.map((st) => (
-            <li key={st.id} className="flex items-center gap-2 text-sm text-[#C7C7CC]">
-              <input
-                type="checkbox"
-                checked={st.completed}
-                onChange={() =>
-                  props.setSubtasks(
-                    props.subtasks.map((s) => (s.id === st.id ? { ...s, completed: !s.completed } : s)),
-                  )
-                }
-              />
-              {st.title}
-            </li>
-          ))}
-        </ul>
-        <input
-          className={`mt-2 ${fieldClass}`}
-          placeholder="Add subtask"
-          value={props.newSubtask}
-          onChange={(e) => props.setNewSubtask(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && props.newSubtask.trim()) {
-              props.setSubtasks([
-                ...props.subtasks,
-                { id: generateId(), title: props.newSubtask.trim(), completed: false },
-              ])
-              props.setNewSubtask('')
-            }
-          }}
-        />
       </div>
     </motion.div>
   )

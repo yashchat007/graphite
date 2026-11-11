@@ -1,11 +1,11 @@
 {
   "name": "Graphite",
   "short_name": "Graphite",
-  "description": "Glassmorphism task dashboard with cross-device sync",
+  "description": "Calm task dashboard with cross-device sync",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B0B0C",
-  "theme_color": "#0B0B0C",
+  "background_color": "#F6F4FB",
+  "theme_color": "#8B7FD6",
   "orientation": "portrait-primary",
   "icons": [
     {

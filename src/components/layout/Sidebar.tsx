@@ -24,21 +24,21 @@ export function Sidebar() {
       <div className="flex items-center gap-3 px-2">
         <motion.div
           layout
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5"
+          className="flex h-10 w-10 items-center justify-center rounded-xl border border-lavender/20 bg-white/70"
         >
-          <Triangle className="h-4 w-4 text-[#E6E6E8]" strokeWidth={1.5} />
+          <Triangle className="h-4 w-4 text-lavender-light" strokeWidth={1.5} />
         </motion.div>
         {!collapsed && (
           <motion.div layout initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <p className="text-sm font-semibold tracking-wide text-[#F2F2F3]">Graphite</p>
-            <p className="text-[11px] text-[#5A5A60]">Task studio</p>
+            <p className="text-sm font-semibold tracking-wide text-heading">Graphite</p>
+            <p className="text-[11px] text-faint">Task studio</p>
           </motion.div>
         )}
       </div>
 
       {!collapsed && (
         <motion.div layout className="flex flex-col gap-1">
-          <p className="px-3 text-[10px] font-semibold uppercase tracking-wider text-[#5A5A60]">
+          <p className="px-3 text-[10px] font-semibold uppercase tracking-wider text-faint">
             Smart lists
           </p>
           {SMART_NAV.map((item) => (
@@ -48,8 +48,8 @@ export function Sidebar() {
               onClick={() => setActiveListId(item.id)}
               className={`focus-ring rounded-xl px-3 py-2 text-left text-sm ${
                 activeListId === item.id
-                  ? 'bg-white/10 text-[#F2F2F3]'
-                  : 'text-[#8A8A8F] hover:bg-white/5'
+                  ? 'bg-lavender-soft text-heading'
+                  : 'text-muted hover:bg-lavender-soft'
               }`}
             >
               {item.label}
@@ -69,7 +69,7 @@ export function Sidebar() {
           type="button"
           onClick={toggleSidebar}
           aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="focus-ring flex w-full items-center justify-center rounded-xl border border-white/8 py-2 text-[#8A8A8F] hover:bg-white/5"
+          className="focus-ring flex w-full items-center justify-center rounded-xl border border-lavender/15 py-2 text-muted hover:bg-white/70"
         >
           <ChevronLeft className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} />
         </button>

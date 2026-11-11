@@ -11,9 +11,9 @@ import { GlassCard } from '../../components/ui/GlassCard'
 const MAX_BYTES = 25 * 1024 * 1024
 
 function KindIcon({ kind }: { kind: ReturnType<typeof fileIconKind> }) {
-  if (kind === 'image') return <ImageIcon className="h-4 w-4 text-[#8A8A8F]" />
-  if (kind === 'pdf' || kind === 'doc') return <FileText className="h-4 w-4 text-[#8A8A8F]" />
-  return <FileIcon className="h-4 w-4 text-[#8A8A8F]" />
+  if (kind === 'image') return <ImageIcon className="h-4 w-4 text-muted" />
+  if (kind === 'pdf' || kind === 'doc') return <FileText className="h-4 w-4 text-muted" />
+  return <FileIcon className="h-4 w-4 text-muted" />
 }
 
 export function MyFilesCard() {
@@ -71,7 +71,7 @@ export function MyFilesCard() {
   return (
     <GlassCard className="p-5">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-[#F2F2F3]">My files</h2>
+        <h2 className="text-sm font-semibold text-heading">My files</h2>
         <Button
           variant="ghost"
           className="!px-2 !py-1 text-xs"
@@ -100,10 +100,10 @@ export function MyFilesCard() {
         onDrop={onDrop}
         className={`mb-3 rounded-2xl border border-dashed px-3 py-4 text-center text-xs transition-colors ${
           disabled
-            ? 'cursor-not-allowed border-white/5 text-[#5A5A60]'
+            ? 'cursor-not-allowed border-lavender/10 text-faint'
             : dragOver
-              ? 'border-white/25 bg-white/[0.06] text-[#C7C7CC]'
-              : 'border-white/10 text-[#8A8A8F]'
+              ? 'border-lavender/40 bg-lavender-soft text-body'
+              : 'border-lavender/20 text-muted'
         }`}
       >
         {disabled ? (
@@ -111,7 +111,7 @@ export function MyFilesCard() {
         ) : uploading ? (
           <span className="flex flex-col items-center gap-2">
             <span>Uploading… {Math.round(progress)}%</span>
-            <span className="h-1 w-full overflow-hidden rounded-full bg-white/10">
+            <span className="h-1 w-full overflow-hidden rounded-full bg-lavender-soft">
               <span className="block h-full silver-gradient transition-all" style={{ width: `${progress}%` }} />
             </span>
           </span>
@@ -121,7 +121,7 @@ export function MyFilesCard() {
       </div>
 
       {files.length === 0 ? (
-        <p className="text-xs text-[#5A5A60]">No files yet.</p>
+        <p className="text-xs text-faint">No files yet.</p>
       ) : (
         <ul className="max-h-56 space-y-2 overflow-y-auto">
           {files.map((raw) => {
@@ -130,7 +130,7 @@ export function MyFilesCard() {
             return (
             <li
               key={f.id}
-              className="flex items-center gap-3 rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm"
+              className="flex items-center gap-3 rounded-xl border border-lavender/15 bg-white/60 px-3 py-2 text-sm"
             >
               <KindIcon kind={fileIconKind(f.contentType, f.name)} />
               <button
@@ -138,8 +138,8 @@ export function MyFilesCard() {
                 className="min-w-0 flex-1 text-left"
                 onClick={() => accessKey && void openStoredFile(f, accessKey).catch(() => {})}
               >
-                <p className="truncate text-[#C7C7CC]">{f.name}</p>
-                <p className="text-[10px] text-[#5A5A60]">
+                <p className="truncate text-body">{f.name}</p>
+                <p className="text-[10px] text-faint">
                   {formatFileSize(f.size)}
                   {formatUploadedAgo(f.uploadedAt) ? ` · ${formatUploadedAgo(f.uploadedAt)}` : ''}
                   {expiresLabel ? ` · ${expiresLabel}` : f.keepPinned ? ' · kept' : ''}
@@ -150,7 +150,7 @@ export function MyFilesCard() {
                 aria-label={f.keepPinned ? 'Unpin file' : 'Keep file'}
                 aria-pressed={f.keepPinned}
                 title={f.keepPinned ? 'Kept — won’t expire' : 'Keep'}
-                className={`focus-ring rounded-lg p-1 ${f.keepPinned ? 'text-[#C7C7CC]' : 'text-[#5A5A60] hover:text-[#8A8A8F]'}`}
+                className={`focus-ring rounded-lg p-1 ${f.keepPinned ? 'text-body' : 'text-faint hover:text-muted'}`}
                 onClick={() => toggleFileKeep(f.id)}
               >
                 <Pin className={`h-3.5 w-3.5 ${f.keepPinned ? 'fill-current' : ''}`} />
@@ -158,7 +158,7 @@ export function MyFilesCard() {
               <button
                 type="button"
                 aria-label={`Delete ${f.name}`}
-                className="focus-ring rounded-lg p-1 text-[#8A8A8F] hover:text-[#F2F2F3]"
+                className="focus-ring rounded-lg p-1 text-muted hover:text-heading"
                 onClick={() => {
                   removeFile(f.id)
                   if (accessKey && !f.pathname.startsWith('mock/')) {

@@ -1,4 +1,5 @@
 import type { SyncDocument, SyncFile, SyncList, SyncTask, Tombstone } from '../../shared/sync-types'
+import { normalizeTask } from './normalize-task'
 import type { StoredFile, Task, TaskList } from './types'
 import { defaultExpiresAt, normalizeStoredFile } from './file-expiry'
 
@@ -24,8 +25,8 @@ export function listToSync(list: TaskList & { updatedAt?: string }): SyncList {
 }
 
 export function syncToTask(task: SyncTask): Task & { updatedAt: string } {
-  const { updatedAt, ...rest } = task
-  return { ...rest, updatedAt }
+  const { updatedAt, tags: _tags, subtasks: _subtasks, ...rest } = task
+  return normalizeTask({ ...rest, updatedAt })
 }
 
 export function syncToList(list: SyncList): TaskList & { updatedAt: string } {

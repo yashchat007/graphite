@@ -1,11 +1,5 @@
 export type Priority = 'high' | 'medium' | 'low' | 'none'
 
-export interface SyncSubtask {
-  id: string
-  title: string
-  completed: boolean
-}
-
 export interface SyncTask {
   id: string
   title: string
@@ -15,14 +9,16 @@ export interface SyncTask {
   endTime?: string
   priority: Priority
   listId: string
-  tags: string[]
-  subtasks: SyncSubtask[]
   completed: boolean
   starred: boolean
   order: number
   createdAt: string
   completedAt?: string
   updatedAt: string
+  /** @deprecated ignored on import */
+  tags?: string[]
+  /** @deprecated ignored on import */
+  subtasks?: { id: string; title: string; completed: boolean }[]
 }
 
 export interface SyncList {

@@ -11,7 +11,7 @@ export function ProgressBar({ value, striped = true, className = '' }: ProgressB
   const reduced = useReducedMotion()
   return (
     <div
-      className={`h-2 w-full overflow-hidden rounded-full bg-white/5 ${className}`}
+      className={`h-2 w-full overflow-hidden rounded-full bg-white/70 ${className}`}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}

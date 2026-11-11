@@ -7,13 +7,11 @@ export function useCompletedSectionTasks() {
   const activeListId = useGraphiteStore((s) => s.activeListId)
   const filterListId = useGraphiteStore((s) => s.filterListId)
   const filterPriority = useGraphiteStore((s) => s.filterPriority)
-  const filterStatus = useGraphiteStore((s) => s.filterStatus)
-
   return useMemo(() => {
     if (activeListId === 'completed') return []
     let list = filterCompletedForSmartList(tasks, activeListId)
     if (filterListId !== 'all') list = list.filter((t) => t.listId === filterListId)
     if (filterPriority !== 'all') list = list.filter((t) => t.priority === filterPriority)
     return [...list].sort((a, b) => a.order - b.order)
-  }, [tasks, activeListId, filterListId, filterPriority, filterStatus])
+  }, [tasks, activeListId, filterListId, filterPriority])
 }

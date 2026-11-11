@@ -24,10 +24,10 @@ export function QuickAdd() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="glass-panel flex flex-col gap-2 p-3 sm:flex-row sm:items-center"
+      className="glass-panel relative z-10 flex flex-col gap-2 p-3 sm:flex-row sm:items-center"
     >
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-        <Plus className="h-4 w-4 shrink-0 text-[#8A8A8F]" aria-hidden />
+        <Plus className="h-4 w-4 shrink-0 text-muted" aria-hidden />
         {recognized.map((t, i) => (
           <Chip key={`${t.start}-${i}`} variant="silver">
             {t.raw}
@@ -40,15 +40,15 @@ export function QuickAdd() {
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit()
           }}
-          placeholder="Quick add — try “Review deck tomorrow 7pm !high #work”"
+          placeholder='Quick add — try "Review deck tomorrow 7pm !high"'
           aria-label="Quick add task"
-          className="min-w-[120px] flex-1 bg-transparent text-sm text-[#F2F2F3] placeholder:text-[#5A5A60] outline-none"
+          className="min-w-[120px] flex-1 bg-transparent text-sm text-heading placeholder:text-faint outline-none"
         />
       </div>
       <button
         type="button"
         onClick={submit}
-        className="focus-ring shrink-0 rounded-full border border-white/10 px-3 py-1.5 text-xs font-medium text-[#C7C7CC] hover:bg-white/5"
+        className="focus-ring shrink-0 rounded-full border border-lavender/20 bg-white/70 px-3 py-1.5 text-xs font-medium text-body hover:bg-lavender-soft"
       >
         Add
       </button>
