@@ -31,7 +31,17 @@ export interface SyncList {
   updatedAt: string
 }
 
-export type TombstoneKind = 'task' | 'list'
+export type TombstoneKind = 'task' | 'list' | 'file'
+
+export interface SyncFile {
+  id: string
+  name: string
+  size: number
+  contentType: string
+  pathname: string
+  uploadedAt: string
+  updatedAt: string
+}
 
 export interface Tombstone {
   id: string
@@ -42,6 +52,7 @@ export interface Tombstone {
 export interface SyncDocument {
   tasks: SyncTask[]
   lists: SyncList[]
+  files: SyncFile[]
   todayNote: string
   todayNoteUpdatedAt: string
   tombstones: Tombstone[]
@@ -50,6 +61,7 @@ export interface SyncDocument {
 export const EMPTY_SYNC_DOC: SyncDocument = {
   tasks: [],
   lists: [],
+  files: [],
   todayNote: '',
   todayNoteUpdatedAt: new Date(0).toISOString(),
   tombstones: [],

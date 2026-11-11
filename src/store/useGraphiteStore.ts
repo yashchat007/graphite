@@ -11,6 +11,7 @@ import type {
   PomodoroState,
   Priority,
   Task,
+  StoredFile,
   TaskList,
   Tombstone,
   UndoAction,
@@ -32,6 +33,7 @@ export interface GraphiteState {
   todayNote: string
   todayNoteUpdatedAt: string
   tombstones: Tombstone[]
+  files: StoredFile[]
   sidebarCollapsed: boolean
   commandPaletteOpen: boolean
   shortcutsOpen: boolean
@@ -75,6 +77,9 @@ export interface GraphiteState {
   createList: (name: string) => string
   renameList: (id: string, name: string) => void
   deleteList: (id: string) => void
+
+  addFile: (file: StoredFile) => void
+  removeFile: (id: string) => void
 
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
@@ -121,6 +126,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       todayNote: 'Capture ideas before they slip away.',
       todayNoteUpdatedAt: nowIso(),
       tombstones: [],
+      files: [],
       sidebarCollapsed: false,
       commandPaletteOpen: false,
       shortcutsOpen: false,
@@ -329,6 +335,24 @@ export const useGraphiteStore = create<GraphiteState>()(
           }
         }),
 
+      addFile: (file) =>
+        set((s) => ({
+          files: [file, ...s.files.filter((f) => f.id !== file.id)],
+        })),
+
+      removeFile: (id) => {
+        const removed = get().files.find((f) => f.id === id)
+        if (!removed) return
+        const deletedAt = nowIso()
+        set((s) => ({
+          files: s.files.filter((f) => f.id !== id),
+          tombstones: [
+            ...s.tombstones.filter((t) => !(t.kind === 'file' && t.id === id)),
+            { id, kind: 'file', deletedAt },
+          ],
+        }))
+      },
+
       pushUndo: (action) => {
         const id = generateId()
         const expiresAt = Date.now() + 5000
@@ -384,6 +408,7 @@ export const useGraphiteStore = create<GraphiteState>()(
         todayNote: s.todayNote,
         todayNoteUpdatedAt: s.todayNoteUpdatedAt,
         tombstones: s.tombstones,
+        files: s.files,
         sidebarCollapsed: s.sidebarCollapsed,
       }),
       onRehydrateStorage: () => (state) => {

@@ -140,6 +140,7 @@ export function useSyncEngine() {
       const syncFieldsChanged =
         state.tasks !== prev.tasks ||
         state.lists !== prev.lists ||
+        state.files !== prev.files ||
         state.todayNote !== prev.todayNote ||
         state.tombstones !== prev.tombstones
       if (syncFieldsChanged) scheduleSyncPush()

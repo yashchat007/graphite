@@ -1,5 +1,5 @@
-import type { SyncDocument, SyncList, SyncTask, Tombstone } from '../../shared/sync-types'
-import type { Task, TaskList } from './types'
+import type { SyncDocument, SyncFile, SyncList, SyncTask, Tombstone } from '../../shared/sync-types'
+import type { StoredFile, Task, TaskList } from './types'
 
 export type { SyncDocument, Tombstone }
 
@@ -32,9 +32,18 @@ export function syncToList(list: SyncList): TaskList & { updatedAt: string } {
   return { ...rest, updatedAt }
 }
 
+export function fileToSync(file: StoredFile): SyncFile {
+  return { ...file, updatedAt: file.updatedAt ?? file.uploadedAt }
+}
+
+export function syncToFile(file: SyncFile): StoredFile {
+  return { ...file }
+}
+
 export function buildSyncDocument(state: {
   tasks: (Task & { updatedAt?: string })[]
   lists: (TaskList & { updatedAt?: string })[]
+  files: StoredFile[]
   todayNote: string
   todayNoteUpdatedAt?: string
   tombstones: Tombstone[]
@@ -42,6 +51,7 @@ export function buildSyncDocument(state: {
   return {
     tasks: state.tasks.map(taskToSync),
     lists: state.lists.map(listToSync),
+    files: state.files.map(fileToSync),
     todayNote: state.todayNote,
     todayNoteUpdatedAt: state.todayNoteUpdatedAt ?? nowIso(),
     tombstones: state.tombstones,

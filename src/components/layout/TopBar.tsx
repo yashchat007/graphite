@@ -1,9 +1,7 @@
 import { format, parseISO } from 'date-fns'
-import { Bell, ChevronRight, Search } from 'lucide-react'
+import { ChevronRight, Search } from 'lucide-react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { SyncIndicator } from './SyncIndicator'
-
-const AVATARS = ['YK', 'AM', 'JL']
 
 export function TopBar() {
   const pickerDate = useGraphiteStore((s) => s.pickerDate)
@@ -32,16 +30,7 @@ export function TopBar() {
       </nav>
 
       <div className="flex items-center gap-3">
-        <div className="hidden items-center -space-x-2 sm:flex" aria-hidden>
-          {AVATARS.map((initials) => (
-            <div
-              key={initials}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/10 text-[10px] font-semibold text-[#F2F2F3]"
-            >
-              {initials}
-            </div>
-          ))}
-        </div>
+        <SyncIndicator />
         <button
           type="button"
           aria-label="Open command palette"
@@ -54,20 +43,6 @@ export function TopBar() {
             ⌘K
           </kbd>
         </button>
-        <SyncIndicator />
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="focus-ring rounded-full border border-white/10 p-2 text-[#8A8A8F] hover:bg-white/5"
-        >
-          <Bell className="h-4 w-4" />
-        </button>
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-full silver-gradient text-xs font-bold text-[#0B0B0C]"
-          aria-label="Your profile"
-        >
-          G
-        </div>
       </div>
     </header>
   )

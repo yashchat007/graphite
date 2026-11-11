@@ -1,13 +1,5 @@
 import { motion } from 'framer-motion'
-import {
-  Activity,
-  Calendar,
-  ChevronLeft,
-  LayoutDashboard,
-  ListTodo,
-  Settings,
-  Triangle,
-} from 'lucide-react'
+import { Calendar, ChevronLeft, LayoutDashboard, ListTodo, Triangle } from 'lucide-react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 import type { NavView } from '../../lib/types'
 
@@ -15,8 +7,6 @@ const NAV: { id: NavView; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'tasks', label: 'Tasks', icon: ListTodo },
   { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'activity', label: 'Activity', icon: Activity },
-  { id: 'settings', label: 'Settings', icon: Settings },
 ]
 
 const SMART_NAV = [
@@ -40,7 +30,7 @@ export function Sidebar({ mobile = false }: { mobile?: boolean }) {
         className="glass-panel fixed bottom-3 left-3 right-3 z-40 flex items-center justify-around px-2 py-2 lg:hidden"
         aria-label="Primary"
       >
-        {NAV.slice(0, 5).map((item) => {
+        {NAV.map((item) => {
           const Icon = item.icon
           const active = activeNav === item.id
           return (

@@ -12,7 +12,6 @@ import { ShortcutsSheet } from './components/modals/ShortcutsSheet'
 import { TaskModal } from './components/modals/TaskModal'
 import { UndoToast } from './components/feedback/UndoToast'
 import { FocusOverlay } from './components/focus/FocusOverlay'
-import { ActivityChart } from './features/activity/ActivityChart'
 import { PomodoroCard } from './features/focus/PomodoroCard'
 import { TodayNote } from './features/tasks/TodayNote'
 import { MyFilesCard } from './features/tasks/MyFilesCard'
@@ -44,6 +43,7 @@ export default function App() {
         })),
         todayNoteUpdatedAt: state.todayNoteUpdatedAt ?? ts,
         tombstones: state.tombstones ?? [],
+        files: state.files ?? [],
       })
       const next = useGraphiteStore.getState()
       if (!next.seeded || next.tasks.length === 0) {
@@ -87,7 +87,6 @@ export default function App() {
               <TodayNote />
               <MyFilesCard />
               <PomodoroCard />
-              <ActivityChart />
             </aside>
           </div>
         </motion.div>

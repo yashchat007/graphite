@@ -48,15 +48,30 @@ export function filterTasksForSmartList(tasks: Task[], listId: string): Task[] {
   }
 }
 
-export function activityLast7Days(tasks: Task[]): { date: string; label: string; count: number }[] {
-  const days: { date: string; label: string; count: number }[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = addDays(new Date(), -i)
-    const key = format(d, 'yyyy-MM-dd')
-    const count = tasks.filter((t) => t.completedAt && isSameDay(parseISO(t.completedAt), d)).length
-    days.push({ date: key, label: format(d, 'EEE'), count })
+export function filterCompletedForSmartList(tasks: Task[], listId: string): Task[] {
+  const now = startOfDay(new Date())
+  const in7 = addDays(now, 7)
+
+  if (listId === 'completed') return []
+
+  switch (listId) {
+    case 'today':
+      return tasks.filter(
+        (t) => t.completed && t.dueDate && isSameDay(parseISO(t.dueDate), now),
+      )
+    case 'upcoming':
+      return tasks.filter((t) => {
+        if (!t.completed || !t.dueDate) return false
+        const d = parseISO(t.dueDate)
+        return d >= now && d <= in7
+      })
+    case 'starred':
+      return tasks.filter((t) => t.completed && t.starred)
+    case 'inbox':
+      return tasks.filter((t) => t.completed && t.listId === 'inbox')
+    default:
+      return tasks.filter((t) => t.completed && t.listId === listId)
   }
-  return days
 }
 
 export function generateId(): string {

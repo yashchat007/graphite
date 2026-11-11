@@ -16,8 +16,7 @@ export function Hero() {
         .
       </h1>
       <p className="mt-2 max-w-xl text-sm text-[#8A8A8F] md:text-base">
-        A calm graphite workspace for tasks, focus, and momentum — offline-first, always in sync on
-        this device.
+        Tasks, focus, and the files that matter — one calm workspace.
       </p>
     </motion.div>
   )

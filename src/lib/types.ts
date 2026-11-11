@@ -33,12 +33,22 @@ export interface TaskList {
 
 export interface Tombstone {
   id: string
-  kind: 'task' | 'list'
+  kind: 'task' | 'list' | 'file'
   deletedAt: string
 }
 
 export type FilterStatus = 'all' | 'todo' | 'done'
-export type NavView = 'dashboard' | 'tasks' | 'calendar' | 'activity' | 'settings'
+export type NavView = 'dashboard' | 'tasks' | 'calendar'
+
+export interface StoredFile {
+  id: string
+  name: string
+  size: number
+  contentType: string
+  pathname: string
+  uploadedAt: string
+  updatedAt: string
+}
 
 export interface UndoAction {
   id: string
