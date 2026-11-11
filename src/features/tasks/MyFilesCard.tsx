@@ -107,7 +107,7 @@ export function MyFilesCard() {
         }`}
       >
         {disabled ? (
-          'Uploads unlock when BLOB_READ_WRITE_TOKEN is set on the server.'
+          'Uploads unlock when file storage is configured on the server.'
         ) : uploading ? (
           <span className="flex flex-col items-center gap-2">
             <span>Uploading… {Math.round(progress)}%</span>

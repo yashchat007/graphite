@@ -83,7 +83,7 @@ export function AccessKeyGate({ children }: { children: ReactNode }) {
               onChange={(e) => setValue(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && void submit()}
               className="focus-ring mb-2 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-[#F2F2F3] outline-none placeholder:text-[#5A5A60]"
-              placeholder="Your APP_SECRET value"
+              placeholder="Your access key"
             />
             {error && (
               <motion.p
