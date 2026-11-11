@@ -1,26 +1,24 @@
 /**
- * Regression: completed tasks appear in the Completed section when filterStatus is 'todo' (default).
+ * Regression: completed tasks appear in the Completed section on non-completed smart lists.
  */
 import assert from 'node:assert'
 
-function completedSectionCount({ activeListId, filterStatus, tasks }) {
+function completedSectionCount({ activeListId, tasks }) {
   if (activeListId === 'completed') return 0
-  void filterStatus
   return tasks.filter((t) => t.completed).length
 }
 
 assert.equal(
   completedSectionCount({
     activeListId: 'today',
-    filterStatus: 'todo',
     tasks: [{ completed: true }, { completed: false }],
   }),
   1,
-  'default todo filter must still show completed section tasks',
+  'completed section must still show completed tasks on Today',
 )
 
 assert.equal(
-  completedSectionCount({ activeListId: 'completed', filterStatus: 'all', tasks: [{ completed: true }] }),
+  completedSectionCount({ activeListId: 'completed', tasks: [{ completed: true }] }),
   0,
   'completed smart list uses main list, not inline section',
 )
