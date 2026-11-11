@@ -6,7 +6,7 @@ import { useGraphiteStore } from '../../store/useGraphiteStore'
 import { Button } from '../ui/Button'
 
 const fieldClass =
-  'focus-ring w-full rounded-xl border border-lavender/20 bg-white/70 px-3 py-2 text-sm text-body outline-none'
+  'focus-ring field-glass w-full rounded-xl px-3 py-2 text-sm text-body outline-none'
 
 export function TaskModal() {
   const open = useGraphiteStore((s) => s.taskModalOpen)
@@ -72,7 +72,7 @@ export function TaskModal() {
           <button
             type="button"
             aria-label="Close modal"
-            className="absolute inset-0 bg-heading/25 backdrop-blur-md"
+            className="modal-overlay absolute inset-0 backdrop-blur-md"
             onClick={() => setTaskModalOpen(false, null)}
           />
           <motion.div

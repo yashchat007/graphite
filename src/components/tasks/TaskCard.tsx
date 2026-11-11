@@ -19,7 +19,7 @@ import { useRef, useState } from 'react'
 import { useCompletedSectionTasks } from '../../hooks/useCompletedTasks'
 import { useVisibleTasks } from '../../hooks/useVisibleTasks'
 import { parseDisplayTimeRange } from '../../lib/nlp-parser'
-import { COLOR_COMPLETE, COLOR_STARRED, PRIORITY_DOT } from '../../lib/theme-states'
+import { priorityColor, VAR_COMPLETE, VAR_STARRED } from '../../lib/theme-states'
 import { dueLabel } from '../../lib/task-utils'
 import type { Task } from '../../lib/types'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
@@ -29,7 +29,7 @@ import { GlassCard } from '../ui/GlassCard'
 
 function PriorityDot({ task }: { task: Task }) {
   const isToday = dueLabel(task) === 'Today'
-  const color = isToday ? PRIORITY_DOT.low : PRIORITY_DOT[task.priority]
+  const color = isToday ? 'var(--theme-sage)' : priorityColor(task.priority)
   return (
     <span
       className="inline-block h-2 w-2 shrink-0 rounded-full"
@@ -65,14 +65,14 @@ function TaskCheckbox({
         onComplete()
       }}
       className={`focus-ring relative mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full transition-colors ${
-        done ? '' : 'border border-lavender/25 bg-white/700'
+        done ? '' : 'border border-glass bg-[var(--theme-input-bg)]'
       }`}
-      style={done ? { backgroundColor: COLOR_COMPLETE } : undefined}
+      style={done ? { backgroundColor: VAR_COMPLETE } : undefined}
     >
       {completing && (
         <motion.span
           className="absolute inset-0 rounded-full opacity-40"
-          style={{ backgroundColor: COLOR_COMPLETE }}
+          style={{ backgroundColor: VAR_COMPLETE }}
           initial={{ scale: 0.5, opacity: 0.5 }}
           animate={{ scale: 2.2, opacity: 0 }}
           transition={{ duration: 0.5 }}
@@ -140,13 +140,13 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
       hoverLift={!isDone}
       cursorGlow={!isDone}
       className={`group p-4 md:p-5 ${sortable ? 'cursor-grab active:cursor-grabbing' : ''} ${
-        selected ? 'ring-1 ring-lavender/30' : ''
+        selected ? 'ring-1 ring-[color-mix(in_srgb,var(--theme-accent)_45%,transparent)]' : ''
       } ${isStarred ? 'border-l-2 pl-[calc(1rem-2px)] md:pl-[calc(1.25rem-2px)]' : ''}`}
       style={
         isStarred
           ? {
-              borderLeftColor: COLOR_STARRED,
-              boxShadow: 'inset 4px 0 24px rgba(232, 180, 160, 0.15)',
+              borderLeftColor: VAR_STARRED,
+              boxShadow: 'inset 4px 0 24px color-mix(in srgb, var(--theme-starred) 28%, transparent)',
             }
           : undefined
       }
@@ -216,7 +216,7 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
               >
                 <Star
                   className="h-4 w-4"
-                  style={task.starred ? { fill: COLOR_STARRED, color: COLOR_STARRED } : undefined}
+                  style={task.starred ? { fill: VAR_STARRED, color: VAR_STARRED } : undefined}
                 />
               </button>
             )}

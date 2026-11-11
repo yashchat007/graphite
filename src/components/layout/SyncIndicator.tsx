@@ -28,7 +28,7 @@ export function SyncIndicator() {
         transition={{ repeat: spin ? Infinity : 0, duration: 1.2, ease: 'easeInOut' }}
       />
       <span
-        className="pointer-events-none absolute -bottom-8 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-md border border-lavender/20 bg-[#141416] px-2 py-1 text-[10px] text-body opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
+        className="glass-panel pointer-events-none absolute -bottom-8 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-md !p-1 px-2 py-1 text-[10px] text-body opacity-0 shadow-lg transition-opacity group-hover:opacity-100"
         role="tooltip"
       >
         {TOOLTIP[displayStatus]}

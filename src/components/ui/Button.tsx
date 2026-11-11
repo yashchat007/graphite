@@ -13,9 +13,10 @@ export function Button({ variant = 'ghost', children, className = '', ...props }
   const base =
     'focus-ring inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors disabled:opacity-40'
   const styles: Record<Variant, string> = {
-    primary: 'lavender-gradient text-white shadow-md shadow-lavender/20 hover:brightness-105 relative overflow-hidden',
-    ghost: 'text-body hover:bg-lavender-soft border border-transparent hover:border-lavender/20',
-    subtle: 'text-muted hover:text-heading hover:bg-lavender-soft',
+    primary:
+      'lavender-gradient text-white shadow-md shadow-[color-mix(in_srgb,var(--theme-accent)_35%,transparent)] hover:brightness-105 relative overflow-hidden',
+    ghost: 'text-body hover:surface-soft border border-transparent hover:border-glass',
+    subtle: 'text-muted hover:text-heading hover:surface-soft',
   }
 
   return (

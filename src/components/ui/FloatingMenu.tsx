@@ -94,7 +94,7 @@ export function MenuItem({
     <button
       type="button"
       role="menuitem"
-      className="focus-ring flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs text-body hover:bg-lavender-soft/80"
+      className="focus-ring flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-xs text-body hover:surface-soft"
       onClick={onClick}
     >
       {children}

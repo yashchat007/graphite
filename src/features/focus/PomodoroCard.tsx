@@ -43,13 +43,20 @@ export function PomodoroCard() {
       <div className="flex flex-col items-center gap-4">
         <div className="relative h-36 w-36">
           <svg className="h-full w-full -rotate-90" viewBox="0 0 120 120" aria-hidden>
-            <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(139, 127, 214, 0.15)" strokeWidth="8" />
+            <circle
+              cx="60"
+              cy="60"
+              r="54"
+              fill="none"
+              stroke="var(--theme-timer-track)"
+              strokeWidth="8"
+            />
             <motion.circle
               cx="60"
               cy="60"
               r="54"
               fill="none"
-              stroke="url(#lavenderRing)"
+              stroke="url(#focusRingGradient)"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={circumference}
@@ -57,9 +64,9 @@ export function PomodoroCard() {
               transition={{ duration: 0.4 }}
             />
             <defs>
-              <linearGradient id="lavenderRing" x1="0" y1="0" x2="1" y2="1">
-                <stop stopColor="#B8AEEA" />
-                <stop offset="1" stopColor="#8B7FD6" />
+              <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
+                <stop stopColor="var(--theme-timer-from)" />
+                <stop offset="1" stopColor="var(--theme-timer-to)" />
               </linearGradient>
             </defs>
           </svg>
