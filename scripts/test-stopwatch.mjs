@@ -1,50 +1,46 @@
 /**
- * Regression: focus stopwatch must advance at wall-clock rate (no double intervals).
+ * Regression: focus stopwatch counts up at wall-clock rate (no double intervals).
  */
 import assert from 'node:assert'
 import {
-  pomodoroPause,
-  pomodoroRemainingSeconds,
-  pomodoroStart,
-  pomodoroSyncRunning,
-} from '../src/lib/pomodoro.ts'
+  formatStopwatch,
+  stopwatchElapsedMs,
+  stopwatchPause,
+  stopwatchStart,
+} from '../src/lib/stopwatch.ts'
 
 const base = {
-  workSeconds: 25 * 60,
-  breakSeconds: 5 * 60,
-  remaining: 120,
-  phase: 'work',
   running: false,
-  runningStartedAt: null,
-  runningRemainingStart: 120,
+  accumulatedMs: 0,
+  startedAt: null,
 }
 
 const t0 = 1_700_000_000_000
-let state = pomodoroStart(base, t0)
-assert.equal(pomodoroRemainingSeconds(state, t0), 120)
-assert.equal(pomodoroRemainingSeconds(state, t0 + 1000), 119)
-assert.equal(pomodoroRemainingSeconds(state, t0 + 2500), 118)
+let state = stopwatchStart(base, t0)
+assert.equal(stopwatchElapsedMs(state, t0), 0)
+assert.equal(formatStopwatch(stopwatchElapsedMs(state, t0)), '0:00')
+assert.equal(stopwatchElapsedMs(state, t0 + 1000), 1000)
+assert.equal(formatStopwatch(stopwatchElapsedMs(state, t0 + 5000)), '0:05')
+assert.equal(stopwatchElapsedMs(state, t0 + 10_000), 10_000)
 
-// Simulating two 1s tick callbacks must not happen: wall clock is the source of truth.
-assert.equal(pomodoroRemainingSeconds(state, t0 + 10_000), 110)
-
-state = pomodoroPause(state, t0 + 5_000)
-assert.equal(state.remaining, 115)
-assert.equal(pomodoroRemainingSeconds(state, t0 + 20_000), 115, 'paused timer stays fixed')
-
-state = pomodoroStart(state, t0 + 30_000)
-assert.equal(pomodoroRemainingSeconds(state, t0 + 31_000), 114)
-
-const atEnd = {
-  ...state,
-  runningRemainingStart: 1,
-  runningStartedAt: t0,
-  remaining: 1,
-  running: true,
+// Two mounted views would each call sync at the same `now`; elapsed is derived, not ticked.
+const atFive = t0 + 5000
+for (let i = 0; i < 4; i++) {
+  assert.equal(
+    stopwatchElapsedMs(state, atFive),
+    5000,
+    `duplicate UI tick ${i} must not advance elapsed`,
+  )
 }
-const rolled = pomodoroSyncRunning(atEnd, t0 + 1500)
-assert.equal(rolled.phase, 'break')
-assert.equal(rolled.running, true)
-assert.equal(rolled.remaining, 5 * 60)
+
+state = stopwatchPause(state, t0 + 5_000)
+assert.equal(state.accumulatedMs, 5000)
+assert.equal(stopwatchElapsedMs(state, t0 + 60_000), 5000, 'paused stopwatch stays fixed')
+
+state = stopwatchStart(state, t0 + 60_000)
+assert.equal(stopwatchElapsedMs(state, t0 + 61_000), 6000)
+
+const long = stopwatchStart({ ...base }, 0)
+assert.equal(formatStopwatch(stopwatchElapsedMs(long, 3_661_000)), '1:01:01')
 
 console.log('stopwatch tests passed')

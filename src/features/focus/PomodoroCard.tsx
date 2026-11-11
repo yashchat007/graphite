@@ -1,38 +1,37 @@
 import { motion } from 'framer-motion'
 import { Pause, Play, RotateCcw } from 'lucide-react'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
-import { pomodoroProgress, pomodoroRemainingSeconds } from '../../lib/pomodoro'
+import {
+  formatStopwatch,
+  stopwatchElapsedMs,
+  stopwatchMinuteSweep,
+} from '../../lib/stopwatch'
 import { GlassCard } from '../../components/ui/GlassCard'
 import { Button } from '../../components/ui/Button'
 
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return `${m}:${String(s).padStart(2, '0')}`
-}
-
 export function PomodoroCard() {
-  const pomodoro = useGraphiteStore((s) => s.pomodoro)
-  const pomodoroClockMs = useGraphiteStore((s) => s.pomodoroClockMs)
+  const focusStopwatch = useGraphiteStore((s) => s.focusStopwatch)
+  const focusStopwatchClockMs = useGraphiteStore((s) => s.focusStopwatchClockMs)
   const tasks = useGraphiteStore((s) => s.tasks)
-  const startPomodoro = useGraphiteStore((s) => s.startPomodoro)
-  const pausePomodoro = useGraphiteStore((s) => s.pausePomodoro)
-  const resetPomodoro = useGraphiteStore((s) => s.resetPomodoro)
+  const startFocusStopwatch = useGraphiteStore((s) => s.startFocusStopwatch)
+  const pauseFocusStopwatch = useGraphiteStore((s) => s.pauseFocusStopwatch)
+  const resetFocusStopwatch = useGraphiteStore((s) => s.resetFocusStopwatch)
   const selectedTaskId = useGraphiteStore((s) => s.selectedTaskId)
 
-  const displayNow = pomodoro.running ? pomodoroClockMs : 0
-  const remaining = pomodoroRemainingSeconds(pomodoro, displayNow)
-  const progress = pomodoroProgress(pomodoro, displayNow)
+  const displayNow = focusStopwatch.running ? focusStopwatchClockMs : 0
+  const elapsedMs = stopwatchElapsedMs(focusStopwatch, displayNow)
+  const sweep = stopwatchMinuteSweep(focusStopwatch, displayNow)
   const circumference = 2 * Math.PI * 54
-  const focusTask = tasks.find((t) => t.id === (pomodoro.focusTaskId ?? selectedTaskId))
+  const focusTask = tasks.find(
+    (t) => t.id === (focusStopwatch.focusTaskId ?? selectedTaskId),
+  )
+  const display = formatStopwatch(elapsedMs)
 
   return (
     <GlassCard className="p-5">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-heading">Focus</h2>
-        <span className="text-[11px] uppercase tracking-wide text-faint">
-          {pomodoro.phase === 'work' ? '25 / 5' : 'Break'}
-        </span>
+        <span className="text-[11px] uppercase tracking-wide text-faint">Stopwatch</span>
       </div>
 
       <div className="flex flex-col items-center gap-4">
@@ -55,8 +54,8 @@ export function PomodoroCard() {
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={circumference}
-              animate={{ strokeDashoffset: circumference * (1 - progress) }}
-              transition={{ duration: 0.4 }}
+              animate={{ strokeDashoffset: circumference * (1 - sweep) }}
+              transition={{ duration: 0.25, ease: 'linear' }}
             />
             <defs>
               <linearGradient id="focusRingGradient" x1="0" y1="0" x2="1" y2="1">
@@ -66,14 +65,12 @@ export function PomodoroCard() {
             </defs>
           </svg>
           <motion.div
-            key={remaining}
-            initial={{ opacity: 0.5 }}
+            key={display}
+            initial={{ opacity: 0.85 }}
             animate={{ opacity: 1 }}
             className="absolute inset-0 flex flex-col items-center justify-center"
           >
-            <span className="text-3xl font-semibold tabular-nums text-heading">
-              {formatTime(remaining)}
-            </span>
+            <span className="text-3xl font-semibold tabular-nums text-heading">{display}</span>
           </motion.div>
         </div>
 
@@ -84,12 +81,16 @@ export function PomodoroCard() {
         <div className="flex flex-wrap justify-center gap-2">
           <Button
             variant="primary"
-            onClick={() => (pomodoro.running ? pausePomodoro() : startPomodoro(selectedTaskId ?? undefined))}
+            onClick={() =>
+              focusStopwatch.running
+                ? pauseFocusStopwatch()
+                : startFocusStopwatch(selectedTaskId ?? undefined)
+            }
           >
-            {pomodoro.running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-            {pomodoro.running ? 'Pause' : 'Start'}
+            {focusStopwatch.running ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {focusStopwatch.running ? 'Pause' : 'Start'}
           </Button>
-          <Button variant="ghost" onClick={resetPomodoro}>
+          <Button variant="ghost" onClick={resetFocusStopwatch}>
             <RotateCcw className="h-4 w-4" />
             Reset
           </Button>

@@ -6,7 +6,7 @@ import { buildTaskFromQuickAdd } from '../lib/nlp-parser'
 import { normalizeTask } from '../lib/normalize-task'
 import { filterTasksForSmartList, generateId } from '../lib/task-utils'
 import type {
-  PomodoroState,
+  FocusStopwatchState,
   Priority,
   Task,
   StoredFile,
@@ -15,12 +15,7 @@ import type {
   UndoAction,
 } from '../lib/types'
 import { nowIso } from '../lib/sync-document'
-import {
-  pomodoroPause,
-  pomodoroRemainingSeconds,
-  pomodoroStart,
-  pomodoroSyncRunning,
-} from '../lib/pomodoro'
+import { stopwatchPause, stopwatchReset, stopwatchStart } from '../lib/stopwatch'
 
 export interface GraphiteState {
   hydrated: boolean
@@ -43,9 +38,9 @@ export interface GraphiteState {
   editingTaskId: string | null
   focusMode: boolean
   focusTaskId: string | null
-  pomodoro: PomodoroState
-  /** Bumped by the app-level pomodoro clock so timer UIs re-render without local intervals. */
-  pomodoroClockMs: number
+  focusStopwatch: FocusStopwatchState
+  /** Bumped by the app-level stopwatch clock so timer UIs re-render without local intervals. */
+  focusStopwatchClockMs: number
   undoQueue: UndoAction[]
   quickAddDraft: string
 
@@ -82,22 +77,18 @@ export interface GraphiteState {
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
 
-  syncPomodoro: (now?: number) => void
-  startPomodoro: (taskId?: string) => void
-  pausePomodoro: () => void
-  resetPomodoro: () => void
-  setPomodoroFocusTask: (taskId: string | null) => void
+  syncFocusStopwatch: (now?: number) => void
+  startFocusStopwatch: (taskId?: string) => void
+  pauseFocusStopwatch: () => void
+  resetFocusStopwatch: () => void
+  setFocusStopwatchTask: (taskId: string | null) => void
 
 }
 
-const defaultPomodoro: PomodoroState = {
-  workSeconds: 25 * 60,
-  breakSeconds: 5 * 60,
-  remaining: 25 * 60,
-  phase: 'work',
+const defaultFocusStopwatch: FocusStopwatchState = {
   running: false,
-  runningStartedAt: null,
-  runningRemainingStart: 25 * 60,
+  accumulatedMs: 0,
+  startedAt: null,
 }
 
 export function applyTaskFilters(
@@ -133,8 +124,8 @@ export const useGraphiteStore = create<GraphiteState>()(
       editingTaskId: null,
       focusMode: false,
       focusTaskId: null,
-      pomodoro: { ...defaultPomodoro },
-      pomodoroClockMs: 0,
+      focusStopwatch: { ...defaultFocusStopwatch },
+      focusStopwatchClockMs: 0,
       undoQueue: [],
       quickAddDraft: '',
 
@@ -347,52 +338,43 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       popUndo: (id) => set((s) => ({ undoQueue: s.undoQueue.filter((u) => u.id !== id) })),
 
-      syncPomodoro: (now = Date.now()) => {
-        const synced = pomodoroSyncRunning(get().pomodoro, now)
-        const remaining = pomodoroRemainingSeconds(synced, now)
-        const pomodoro =
-          synced.remaining !== remaining ? { ...synced, remaining } : synced
-        set({ pomodoro, pomodoroClockMs: now })
+      syncFocusStopwatch: (now = Date.now()) => {
+        set({ focusStopwatchClockMs: now })
       },
 
-      startPomodoro: (taskId) =>
+      startFocusStopwatch: (taskId) =>
         set((s) => {
           const now = Date.now()
-          let pomodoro = pomodoroStart(
+          const focusStopwatch = stopwatchStart(
             {
-              ...s.pomodoro,
-              focusTaskId: taskId ?? s.pomodoro.focusTaskId ?? s.selectedTaskId ?? undefined,
+              ...s.focusStopwatch,
+              focusTaskId:
+                taskId ?? s.focusStopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
             },
             now,
           )
-          pomodoro = pomodoroSyncRunning(pomodoro, now)
-          return { pomodoro, pomodoroClockMs: now }
+          return { focusStopwatch, focusStopwatchClockMs: now }
         }),
 
-      pausePomodoro: () =>
+      pauseFocusStopwatch: () =>
         set((s) => {
           const now = Date.now()
           return {
-            pomodoro: pomodoroPause(s.pomodoro, now),
-            pomodoroClockMs: now,
+            focusStopwatch: stopwatchPause(s.focusStopwatch, now),
+            focusStopwatchClockMs: now,
           }
         }),
 
-      resetPomodoro: () =>
+      resetFocusStopwatch: () =>
         set((s) => ({
-          pomodoro: {
-            ...s.pomodoro,
-            running: false,
-            phase: 'work',
-            remaining: s.pomodoro.workSeconds,
-            runningStartedAt: null,
-            runningRemainingStart: s.pomodoro.workSeconds,
-          },
-          pomodoroClockMs: Date.now(),
+          focusStopwatch: stopwatchReset(s.focusStopwatch),
+          focusStopwatchClockMs: Date.now(),
         })),
 
-      setPomodoroFocusTask: (taskId) =>
-        set((s) => ({ pomodoro: { ...s.pomodoro, focusTaskId: taskId ?? undefined } })),
+      setFocusStopwatchTask: (taskId) =>
+        set((s) => ({
+          focusStopwatch: { ...s.focusStopwatch, focusTaskId: taskId ?? undefined },
+        })),
 
     }),
     {
