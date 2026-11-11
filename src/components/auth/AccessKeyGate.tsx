@@ -36,7 +36,7 @@ export function AccessKeyGate({ children }: { children: ReactNode }) {
       if (result.localOnly) setSyncStatus('local-only')
       else setSyncStatus('synced')
     } catch {
-      setError('Could not reach the server. You can retry, or use local-only if Redis isn’t configured.')
+      setError('Could not reach the server. You can retry, or continue if sync isn’t configured yet.')
       setAccessKey(key)
       setSyncStatus('local-only')
     } finally {
@@ -68,8 +68,8 @@ export function AccessKeyGate({ children }: { children: ReactNode }) {
             </div>
 
             <p className="mb-4 text-sm text-[#8A8A8F]">
-              Use the same secret on your laptop and phone so tasks stay in sync. It’s stored locally on
-              this device only.
+              Use the same secret on your laptop and phone so tasks stay in sync. The key stays on this
+              device only.
             </p>
 
             <label className="mb-2 flex items-center gap-2 text-xs font-medium text-[#C7C7CC]" htmlFor="access-key">

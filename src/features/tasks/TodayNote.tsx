@@ -23,7 +23,6 @@ export function TodayNote() {
         className="focus-ring w-full resize-none rounded-2xl border border-white/8 bg-white/5 p-3 text-sm text-[#C7C7CC] placeholder:text-[#5A5A60] outline-none"
         placeholder="Jot down thoughts for today…"
       />
-      <p className="mt-2 text-[10px] text-[#5A5A60]">Autosaved locally</p>
     </GlassCard>
   )
 }
