@@ -100,7 +100,18 @@ export function applyTaskFilters(
   let list = filterTasksForSmartList(tasks, state.activeListId)
   if (state.filterListId !== 'all') list = list.filter((t) => t.listId === state.filterListId)
   if (state.filterPriority !== 'all') list = list.filter((t) => t.priority === state.filterPriority)
-  return [...list].sort((a, b) => a.order - b.order)
+  const sorted = [...list]
+  if (state.activeListId === 'upcoming') {
+    sorted.sort((a, b) => {
+      const ad = a.dueDate ?? ''
+      const bd = b.dueDate ?? ''
+      if (ad !== bd) return ad.localeCompare(bd)
+      return a.order - b.order
+    })
+  } else {
+    sorted.sort((a, b) => a.order - b.order)
+  }
+  return sorted
 }
 
 export const useGraphiteStore = create<GraphiteState>()(

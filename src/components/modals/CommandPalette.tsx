@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import { resolveActiveListForTask } from '../../lib/task-utils'
 import { useGraphiteStore } from '../../store/useGraphiteStore'
 
 export function CommandPalette() {
@@ -34,6 +35,8 @@ export function CommandPalette() {
 
   const run = (item: (typeof results)[number]) => {
     if (item.type === 'task') {
+      const task = tasks.find((t) => t.id === item.id)
+      if (task) setActiveListId(resolveActiveListForTask(task))
       setSelectedTaskId(item.id)
       setExpandedTaskId(item.id)
     }
