@@ -11,9 +11,9 @@ const page = await browser.newPage()
 
 const waitHero = () => page.getByRole('heading', { name: /Make things/i }).waitFor({ timeout: 20000 })
 
-await page.addInitScript(() => localStorage.clear())
-
 await page.goto(BASE, { waitUntil: 'networkidle' })
+await page.evaluate(() => localStorage.clear())
+await page.reload({ waitUntil: 'networkidle' })
 await page.getByText('Enter access key').waitFor({ timeout: 15000 })
 await page.getByLabel('Access key').fill('dev-local-key')
 await page.getByRole('button', { name: 'Continue' }).click()
@@ -48,6 +48,7 @@ await page.evaluate(() => {
     },
   ]
   localStorage.setItem(key, JSON.stringify(parsed))
+  localStorage.setItem('graphite-access-key', 'dev-local-key')
 })
 
 await page.reload({ waitUntil: 'networkidle' })
