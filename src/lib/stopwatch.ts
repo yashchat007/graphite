@@ -1,6 +1,6 @@
-import type { FocusStopwatchState } from './types'
+import type { StopwatchState } from './types'
 
-export function stopwatchElapsedMs(state: FocusStopwatchState, now = Date.now()): number {
+export function stopwatchElapsedMs(state: StopwatchState, now = Date.now()): number {
   if (!state.running || state.startedAt == null) {
     return state.accumulatedMs
   }
@@ -8,12 +8,12 @@ export function stopwatchElapsedMs(state: FocusStopwatchState, now = Date.now())
 }
 
 /** 0–1 sweep within the current minute (for the focus ring). */
-export function stopwatchMinuteSweep(state: FocusStopwatchState, now = Date.now()): number {
+export function stopwatchMinuteSweep(state: StopwatchState, now = Date.now()): number {
   const elapsed = stopwatchElapsedMs(state, now)
   return (elapsed % 60_000) / 60_000
 }
 
-export function stopwatchPause(state: FocusStopwatchState, now = Date.now()): FocusStopwatchState {
+export function stopwatchPause(state: StopwatchState, now = Date.now()): StopwatchState {
   if (!state.running) return state
   return {
     ...state,
@@ -23,7 +23,7 @@ export function stopwatchPause(state: FocusStopwatchState, now = Date.now()): Fo
   }
 }
 
-export function stopwatchStart(state: FocusStopwatchState, now = Date.now()): FocusStopwatchState {
+export function stopwatchStart(state: StopwatchState, now = Date.now()): StopwatchState {
   if (state.running) return state
   return {
     ...state,
@@ -32,7 +32,7 @@ export function stopwatchStart(state: FocusStopwatchState, now = Date.now()): Fo
   }
 }
 
-export function stopwatchReset(state: FocusStopwatchState): FocusStopwatchState {
+export function stopwatchReset(state: StopwatchState): StopwatchState {
   return {
     ...state,
     running: false,

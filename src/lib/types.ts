@@ -48,7 +48,7 @@ export interface UndoAction {
   expiresAt: number
 }
 
-export interface FocusStopwatchState {
+export interface StopwatchState {
   running: boolean
   /** Total elapsed ms from completed run segments. */
   accumulatedMs: number

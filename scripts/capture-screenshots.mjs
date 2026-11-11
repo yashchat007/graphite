@@ -25,17 +25,9 @@ await page.screenshot({ path: `${OUT}/graphite-dashboard-desktop.png`, fullPage:
 const firstMenu = page.locator('button[aria-label="Task menu"]').first()
 await firstMenu.click()
 await page.waitForTimeout(450)
-await page.screenshot({ path: `${OUT}/graphite-task-menu-open.png`, fullPage: false })
+await page.screenshot({ path: `${OUT}/graphite-task-menu-no-edit.png`, fullPage: false })
 await page.keyboard.press('Escape')
 await page.waitForTimeout(200)
-
-await firstMenu.click()
-await page.getByRole('menuitem', { name: 'Edit' }).click()
-await page.waitForSelector('#task-modal-title', { timeout: 5000 })
-await page.waitForTimeout(450)
-await page.screenshot({ path: `${OUT}/graphite-edit-task-modal.png`, fullPage: false })
-await page.getByRole('button', { name: 'Cancel' }).click()
-await page.waitForTimeout(300)
 
 await page.locator('aside').getByRole('button', { name: 'Completed', exact: true }).click()
 await page.waitForTimeout(600)

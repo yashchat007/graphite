@@ -3,17 +3,17 @@ import { useGraphiteStore } from '../store/useGraphiteStore'
 
 /**
  * Single app-level clock: one interval bumps UI ticks so duplicate
- * Focus cards never register more than one stopwatch interval.
+ * StopwatchCard instances never register more than one stopwatch interval.
  */
 export function useFocusStopwatchClock() {
-  const running = useGraphiteStore((s) => s.focusStopwatch.running)
-  const syncFocusStopwatch = useGraphiteStore((s) => s.syncFocusStopwatch)
+  const running = useGraphiteStore((s) => s.stopwatch.running)
+  const syncStopwatch = useGraphiteStore((s) => s.syncStopwatch)
 
   useEffect(() => {
     if (!running) return
-    const tick = () => syncFocusStopwatch()
+    const tick = () => syncStopwatch()
     tick()
     const id = window.setInterval(tick, 250)
     return () => clearInterval(id)
-  }, [running, syncFocusStopwatch])
+  }, [running, syncStopwatch])
 }

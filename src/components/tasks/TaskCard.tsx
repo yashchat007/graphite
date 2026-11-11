@@ -14,7 +14,7 @@ import {
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronDown, Copy, MoreHorizontal, Pencil, Star, Trash2 } from 'lucide-react'
+import { Check, ChevronDown, Copy, MoreHorizontal, Star, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useCompletedSectionTasks } from '../../hooks/useCompletedTasks'
 import { useVisibleTasks } from '../../hooks/useVisibleTasks'
@@ -104,7 +104,6 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
   const toggleStar = useGraphiteStore((s) => s.toggleStar)
   const duplicateTask = useGraphiteStore((s) => s.duplicateTask)
   const deleteTask = useGraphiteStore((s) => s.deleteTask)
-  const setTaskModalOpen = useGraphiteStore((s) => s.setTaskModalOpen)
   const updateTask = useGraphiteStore((s) => s.updateTask)
   const lists = useGraphiteStore((s) => s.lists)
 
@@ -243,9 +242,9 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
               minWidth={168}
             >
               {[
-                { icon: Pencil, label: 'Edit', action: () => setTaskModalOpen(true, task.id) },
                 { icon: Copy, label: 'Duplicate', action: () => duplicateTask(task.id) },
                 { icon: Copy, label: 'Move to Work', action: () => updateTask(task.id, { listId: 'work' }) },
+                { icon: Copy, label: 'Move to Personal', action: () => updateTask(task.id, { listId: 'personal' }) },
                 { icon: Trash2, label: 'Delete', action: () => deleteTask(task.id) },
               ].map((item) => (
                 <MenuItem
@@ -298,6 +297,53 @@ function TaskCardBody({ task, index, sortable = true }: TaskCardProps) {
 
 function SortableTaskCard(props: TaskCardProps) {
   return <TaskCardBody {...props} sortable />
+}
+
+function DeleteAllCompletedBar({ count }: { count: number }) {
+  const deleteAllCompleted = useGraphiteStore((s) => s.deleteAllCompleted)
+  const [confirm, setConfirm] = useState(false)
+
+  if (count === 0) return null
+
+  return (
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-lavender/20 bg-white/50 px-4 py-3">
+      {!confirm ? (
+        <>
+          <p className="text-xs text-muted">{count} completed task{count === 1 ? '' : 's'}</p>
+          <button
+            type="button"
+            onClick={() => setConfirm(true)}
+            className="focus-ring rounded-full border border-lavender/25 px-3 py-1.5 text-xs font-medium text-body hover:bg-lavender-soft"
+          >
+            Delete all
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-xs text-body">Remove all completed tasks? This syncs everywhere.</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => setConfirm(false)}
+              className="focus-ring rounded-full px-3 py-1.5 text-xs text-muted hover:bg-lavender-soft"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                deleteAllCompleted()
+                setConfirm(false)
+              }}
+              className="focus-ring rounded-full border border-lavender/30 bg-lavender-soft px-3 py-1.5 text-xs font-medium text-heading"
+            >
+              Delete all
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 export function TaskList() {
@@ -371,11 +417,12 @@ export function TaskList() {
           )}
 
           {isCompletedView && (
-            <div className="flex flex-col gap-3">
+            <motion.div className="flex flex-col gap-3">
+              <DeleteAllCompletedBar count={inlineCompleted.length} />
               {inlineCompleted.map((task, i) => (
                 <TaskCardBody key={task.id} task={task} index={i} sortable={false} />
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </SortableContext>

@@ -1,12 +1,14 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { STORAGE_KEY } from '../lib/constants'
+import { istTodayYmd } from '../lib/ist-time'
+import { graphitePersistStorage } from '../lib/persist-storage'
 import { createSeedTasks, SEED_LISTS } from '../lib/seed'
 import { buildTaskFromQuickAdd } from '../lib/nlp-parser'
 import { normalizeTask } from '../lib/normalize-task'
 import { filterTasksForSmartList, generateId } from '../lib/task-utils'
 import type {
-  FocusStopwatchState,
+  StopwatchState,
   Priority,
   Task,
   StoredFile,
@@ -35,12 +37,11 @@ export interface GraphiteState {
   commandPaletteOpen: boolean
   shortcutsOpen: boolean
   taskModalOpen: boolean
-  editingTaskId: string | null
   focusMode: boolean
   focusTaskId: string | null
-  focusStopwatch: FocusStopwatchState
+  stopwatch: StopwatchState
   /** Bumped by the app-level stopwatch clock so timer UIs re-render without local intervals. */
-  focusStopwatchClockMs: number
+  stopwatchClockMs: number
   undoQueue: UndoAction[]
   quickAddDraft: string
 
@@ -53,7 +54,7 @@ export interface GraphiteState {
   toggleSidebar: () => void
   setCommandPaletteOpen: (v: boolean) => void
   setShortcutsOpen: (v: boolean) => void
-  setTaskModalOpen: (v: boolean, editingId?: string | null) => void
+  setTaskModalOpen: (v: boolean) => void
   setFocusMode: (on: boolean, taskId?: string | null) => void
   setQuickAddDraft: (d: string) => void
 
@@ -63,6 +64,7 @@ export interface GraphiteState {
   completeTask: (id: string) => void
   uncompleteTask: (id: string) => void
   deleteTask: (id: string) => void
+  deleteAllCompleted: () => void
   duplicateTask: (id: string) => void
   toggleStar: (id: string) => void
   reorderTasks: (orderedIds: string[]) => void
@@ -77,15 +79,15 @@ export interface GraphiteState {
   pushUndo: (action: Omit<UndoAction, 'id' | 'expiresAt'>) => void
   popUndo: (id: string) => void
 
-  syncFocusStopwatch: (now?: number) => void
-  startFocusStopwatch: (taskId?: string) => void
-  pauseFocusStopwatch: () => void
-  resetFocusStopwatch: () => void
-  setFocusStopwatchTask: (taskId: string | null) => void
+  syncStopwatch: (now?: number) => void
+  startStopwatch: (taskId?: string) => void
+  pauseStopwatch: () => void
+  resetStopwatch: () => void
+  setStopwatchFocusTask: (taskId: string | null) => void
 
 }
 
-const defaultFocusStopwatch: FocusStopwatchState = {
+const defaultStopwatch: StopwatchState = {
   running: false,
   accumulatedMs: 0,
   startedAt: null,
@@ -121,11 +123,10 @@ export const useGraphiteStore = create<GraphiteState>()(
       commandPaletteOpen: false,
       shortcutsOpen: false,
       taskModalOpen: false,
-      editingTaskId: null,
       focusMode: false,
       focusTaskId: null,
-      focusStopwatch: { ...defaultFocusStopwatch },
-      focusStopwatchClockMs: 0,
+      stopwatch: { ...defaultStopwatch },
+      stopwatchClockMs: 0,
       undoQueue: [],
       quickAddDraft: '',
 
@@ -138,8 +139,7 @@ export const useGraphiteStore = create<GraphiteState>()(
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
       setCommandPaletteOpen: (v) => set({ commandPaletteOpen: v }),
       setShortcutsOpen: (v) => set({ shortcutsOpen: v }),
-      setTaskModalOpen: (v, editingId = null) =>
-        set({ taskModalOpen: v, editingTaskId: editingId }),
+      setTaskModalOpen: (v) => set({ taskModalOpen: v }),
       setFocusMode: (on, taskId = null) =>
         set({ focusMode: on, focusTaskId: on ? taskId ?? get().selectedTaskId : null }),
       setQuickAddDraft: (d) => set({ quickAddDraft: d }),
@@ -155,9 +155,12 @@ export const useGraphiteStore = create<GraphiteState>()(
           active === 'inbox'
             ? 'work'
             : active
+        let dueDate = parsed.dueDate
+        if (!dueDate && active === 'today') dueDate = istTodayYmd()
+        if (!dueDate && active === 'upcoming') dueDate = istTodayYmd()
         return get().addTask({
           title: parsed.title,
-          dueDate: parsed.dueDate,
+          dueDate,
           dueTime: parsed.dueTime,
           priority: parsed.priority,
           listId,
@@ -218,6 +221,25 @@ export const useGraphiteStore = create<GraphiteState>()(
               : t,
           ),
         })),
+
+      deleteAllCompleted: () => {
+        const completed = get().tasks.filter((t) => t.completed)
+        if (completed.length === 0) return
+        const deletedAt = nowIso()
+        set((s) => ({
+          tasks: s.tasks.filter((t) => !t.completed),
+          tombstones: [
+            ...s.tombstones.filter(
+              (t) => !completed.some((c) => c.id === t.id && t.kind === 'task'),
+            ),
+            ...completed.map((t) => ({
+              id: t.id,
+              kind: 'task' as const,
+              deletedAt,
+            })),
+          ],
+        }))
+      },
 
       deleteTask: (id) => {
         const prev = get().tasks.find((t) => t.id === id)
@@ -338,47 +360,48 @@ export const useGraphiteStore = create<GraphiteState>()(
 
       popUndo: (id) => set((s) => ({ undoQueue: s.undoQueue.filter((u) => u.id !== id) })),
 
-      syncFocusStopwatch: (now = Date.now()) => {
-        set({ focusStopwatchClockMs: now })
+      syncStopwatch: (now = Date.now()) => {
+        set({ stopwatchClockMs: now })
       },
 
-      startFocusStopwatch: (taskId) =>
+      startStopwatch: (taskId) =>
         set((s) => {
           const now = Date.now()
-          const focusStopwatch = stopwatchStart(
+          const stopwatch = stopwatchStart(
             {
-              ...s.focusStopwatch,
+              ...s.stopwatch,
               focusTaskId:
-                taskId ?? s.focusStopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
+                taskId ?? s.stopwatch.focusTaskId ?? s.selectedTaskId ?? undefined,
             },
             now,
           )
-          return { focusStopwatch, focusStopwatchClockMs: now }
+          return { stopwatch, stopwatchClockMs: now }
         }),
 
-      pauseFocusStopwatch: () =>
+      pauseStopwatch: () =>
         set((s) => {
           const now = Date.now()
           return {
-            focusStopwatch: stopwatchPause(s.focusStopwatch, now),
-            focusStopwatchClockMs: now,
+            stopwatch: stopwatchPause(s.stopwatch, now),
+            stopwatchClockMs: now,
           }
         }),
 
-      resetFocusStopwatch: () =>
+      resetStopwatch: () =>
         set((s) => ({
-          focusStopwatch: stopwatchReset(s.focusStopwatch),
-          focusStopwatchClockMs: Date.now(),
+          stopwatch: stopwatchReset(s.stopwatch),
+          stopwatchClockMs: Date.now(),
         })),
 
-      setFocusStopwatchTask: (taskId) =>
+      setStopwatchFocusTask: (taskId) =>
         set((s) => ({
-          focusStopwatch: { ...s.focusStopwatch, focusTaskId: taskId ?? undefined },
+          stopwatch: { ...s.stopwatch, focusTaskId: taskId ?? undefined },
         })),
 
     }),
     {
       name: STORAGE_KEY,
+      storage: createJSONStorage(() => graphitePersistStorage),
       partialize: (s) => ({
         seeded: s.seeded,
         tasks: s.tasks,
