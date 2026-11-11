@@ -1,7 +1,7 @@
 import { addDays, parseISO } from 'date-fns'
 import { del } from '@vercel/blob'
-import type { SyncDocument, SyncFile } from '../shared/sync-types'
-import { blobConfigured } from './blob'
+import type { SyncDocument, SyncFile } from '../shared/sync-types.js'
+import { blobConfigured } from './blob.js'
 export const FILE_RETENTION_DAYS = 7
 
 export function defaultExpiresAt(uploadedAt: string): string {

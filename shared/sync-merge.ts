@@ -1,4 +1,4 @@
-import type { SyncDocument, SyncFile, SyncList, SyncTask, Tombstone } from './sync-types'
+import type { SyncDocument, SyncFile, SyncList, SyncTask, Tombstone } from './sync-types.js'
 
 function maxIso(a: string, b: string): string {
   return a >= b ? a : b

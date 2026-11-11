@@ -1,10 +1,10 @@
 import type { IncomingMessage, ServerResponse } from 'http'
-import { documentFromClient, mergeDocuments } from '../shared/sync-merge'
-import type { SyncDocument } from '../shared/sync-types'
-import { assertAuthorized } from './auth'
-import { loadPrunedRemoteState } from './load-pruned-state'
-import { pruneExpiredFiles } from './file-expiry'
-import { redisConfigured, saveRemoteState } from './redis'
+import { documentFromClient, mergeDocuments } from '../shared/sync-merge.js'
+import type { SyncDocument } from '../shared/sync-types.js'
+import { assertAuthorized } from './auth.js'
+import { loadPrunedRemoteState } from './load-pruned-state.js'
+import { pruneExpiredFiles } from './file-expiry.js'
+import { redisConfigured, saveRemoteState } from './redis.js'
 
 async function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
